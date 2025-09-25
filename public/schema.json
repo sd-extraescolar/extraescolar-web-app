@@ -1,0 +1,30 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Extraescolar",
+  "description": "Complemento inteligente para Google Classroom que proporciona administración y visualización avanzada para profesores, estudiantes y coordinadores educativos.",
+  "url": "https://extraescolar.com",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "Extraescolar Team"
+  },
+  "featureList": [
+    "Visualización inteligente del progreso académico",
+    "Gestión simplificada de clases y estudiantes",
+    "Vista consolidada para coordinadores",
+    "Alertas y notificaciones automáticas",
+    "Integración con Google Classroom"
+  ],
+  "audience": {
+    "@type": "Audience",
+    "audienceType": ["Teachers", "Students", "Education Coordinators"]
+  },
+  "keywords": "google classroom, gestión educativa, progreso académico, administración escolar, profesores, estudiantes, coordinadores, classroom complemento, educación digital, seguimiento estudiantil"
+}

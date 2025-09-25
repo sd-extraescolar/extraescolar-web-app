@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Extraescolar Light Theme */
+    --background: 0 0% 100%;
+    --foreground: 210 22% 22%; /* dark-text #2C3E50 */
+    --card: 0 0% 100%;
+    --card-foreground: 210 22% 22%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 22% 22%;
+    --primary: 145 63% 49%; /* education-green #2ECC71 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 204 70% 53%; /* digital-blue #3498DB */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 192 15% 94%; /* light-gray #ECF0F1 */
+    --muted-foreground: 184 9% 65%; /* medium-gray #95A5A6 */
+    --accent: 48 89% 50%; /* progress-yellow #F1C40F */
+    --accent-foreground: 210 22% 22%;
+    --destructive: 6 78% 57%; /* alert-red #E74C3C */
+    --destructive-foreground: 0 0% 100%;
+    --border: 184 9% 65%;
+    --input: 192 15% 94%;
+    --ring: 145 63% 49%;
+    --chart-1: 145 63% 49%; /* education-green */
+    --chart-2: 204 70% 53%; /* digital-blue */
+    --chart-3: 48 89% 50%; /* progress-yellow */
+    --chart-4: 6 78% 57%; /* alert-red */
+    --chart-5: 184 9% 65%; /* medium-gray */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Extraescolar Dark Theme */
+    --background: 220 13% 11%; /* #1C1C1E */
+    --foreground: 0 0% 96%; /* #F5F5F7 */
+    --card: 220 13% 11%;
+    --card-foreground: 0 0% 96%;
+    --popover: 220 13% 11%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 145 63% 49%; /* education-green mantiene branding */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 204 70% 53%; /* digital-blue mantiene branding */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 13% 18%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 48 89% 50%; /* progress-yellow mantiene branding */
+    --accent-foreground: 220 13% 11%;
+    --destructive: 6 78% 57%; /* alert-red mantiene branding */
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 145 63% 49%;
+    --chart-1: 145 63% 49%;
+    --chart-2: 204 70% 53%;
+    --chart-3: 48 89% 50%;
+    --chart-4: 6 78% 57%;
+    --chart-5: 0 0% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
