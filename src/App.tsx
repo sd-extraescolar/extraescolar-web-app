@@ -1,21 +1,21 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { HomePage } from "@/features/home/page/HomePage";
-import { AboutPage } from "@/features/about/page/AboutPage";
-import { SEO } from "@/components/SEO";
 import { Layout } from "@/components/Layout";
 import { NotFound } from "@/components/NotFound";
+import { SEO } from "@/components/SEO";
+import { AboutPage } from "@/features/about/page/AboutPage";
+import { HomePage } from "@/features/home/page/HomePage";
+import LoginPage from "@/features/login/page/LoginPage";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
 function App() {
   return (
     <Router>
       <SEO />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<Layout><HomePage /></Layout>} />
+        <Route path="/about" element={<Layout><AboutPage /></Layout>} />
+        <Route path="*" element={<Layout><NotFound /></Layout>} />
+      </Routes>
     </Router>
   );
 }
