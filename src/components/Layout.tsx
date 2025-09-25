@@ -1,3 +1,4 @@
+import { useAuth } from "@/hooks/useAuth";
 import { Link, useLocation } from "react-router-dom";
 
 interface LayoutProps {
@@ -6,6 +7,7 @@ interface LayoutProps {
 
 export const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
+  const { handleLogout, isLoading } = useAuth();
   
   return (
     <div className="min-h-screen bg-background">
@@ -30,7 +32,7 @@ export const Layout = ({ children }: LayoutProps) => {
             </p>
             
             {/* Simple Navigation */}
-            <nav className="flex justify-center gap-6 pt-4">
+            <nav className="flex justify-center gap-6 pt-4 flex-wrap">
               <Link
                 to="/"
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -51,6 +53,15 @@ export const Layout = ({ children }: LayoutProps) => {
               >
                 Acerca de
               </Link>
+              
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                disabled={isLoading}
+                className="px-4 py-2 rounded-lg font-medium transition-colors bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Cerrando...' : 'Cerrar Sesión'}
+              </button>
             </nav>
           </div>
         </div>
