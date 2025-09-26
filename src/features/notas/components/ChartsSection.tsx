@@ -17,7 +17,7 @@ export function ChartsSection({ donutData, barTareaData, barCelulaData }: Charts
   return (
     <>
       <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white rounded-xl p-6 shadow-sm">
+  <div className="bg-blue-50 rounded-xl p-6">
           <h3 className="text-xl font-bold mb-2">Entregas totales</h3>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
@@ -41,7 +41,7 @@ export function ChartsSection({ donutData, barTareaData, barCelulaData }: Charts
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="bg-white rounded-xl p-6 shadow-sm">
+  <div className="bg-blue-50 rounded-xl p-6">
           <h3 className="text-xl font-bold mb-2">Entregas por tarea</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={barTareaData} layout="vertical" margin={{ left: 30, right: 10, top: 10, bottom: 10 }}>
@@ -57,7 +57,7 @@ export function ChartsSection({ donutData, barTareaData, barCelulaData }: Charts
           </ResponsiveContainer>
         </div>
       </div>
-      <div className="mb-8 bg-white rounded-xl p-6 shadow-sm">
+  <div className="mb-8 bg-blue-50 rounded-xl p-6">
         <h3 className="text-xl font-bold mb-2">Entregas por célula</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={barCelulaData} layout="vertical" margin={{ left: 30, right: 10, top: 10, bottom: 10 }}>
