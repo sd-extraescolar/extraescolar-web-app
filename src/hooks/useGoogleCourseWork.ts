@@ -18,7 +18,6 @@ export function useGoogleCourseWork(courseId: string | undefined) {
     
     (async () => {
       try {
-        console.log('Obteniendo tareas para el curso:', courseId);
         
         // Verificar que el token esté establecido
         const token = (window as any).gapi.client.getToken();
@@ -31,7 +30,7 @@ export function useGoogleCourseWork(courseId: string | undefined) {
         let nextPageToken: string | undefined = undefined;
         
         do {
-          const response = await (window as any).gapi.client.classroom.courses.courseWork.list({
+          const response: any = await (window as any).gapi.client.classroom.courses.courseWork.list({
             courseId,
             pageSize: 100, // Máximo permitido por la API
             pageToken: nextPageToken,
@@ -41,10 +40,8 @@ export function useGoogleCourseWork(courseId: string | undefined) {
           allCourseWork = [...allCourseWork, ...courseWork];
           nextPageToken = response.result.nextPageToken;
           
-          console.log(`Obtenidas ${courseWork.length} tareas, total: ${allCourseWork.length}`);
         } while (nextPageToken);
         
-        console.log(`Total de tareas obtenidas: ${allCourseWork.length}`);
         setCourseWork(allCourseWork);
       } catch (err: any) {
         console.error('Error obteniendo tareas:', err);

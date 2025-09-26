@@ -36,9 +36,9 @@ export default function LoginPage() {
               {"!"}
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground text-pretty leading-relaxed">
-              Somos una extensión de Google Classroom que facilita
+              Somos una extensión de Google Classroom para profesores
               <br className="hidden sm:block" />
-              la gestión y el trackeo los cursos de los profesores
+              que facilita la gestión y el trackeo de tus cursos
             </p>
           </div>
 

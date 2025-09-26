@@ -1,15 +1,13 @@
 import { BookOpen, CheckCircle, Clock, TrendingUp } from "lucide-react";
 
 interface StatsCardsProps {
-  totalCursos: number;
-  totalTareas: number;
   totalEntregas: number;
   totalPendientes: number;
   promedio: number;
   porcentajeAprobados: number;
 }
 
-export function StatsCards({ totalCursos, totalTareas, totalEntregas, totalPendientes, promedio, porcentajeAprobados }: StatsCardsProps) {
+export function StatsCards({ totalEntregas, totalPendientes, promedio, porcentajeAprobados }: StatsCardsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
       <div className="bg-green-500 rounded-xl p-6">

@@ -18,7 +18,6 @@ export function GoogleSignInButton({
       onClick();
     } else {
       // Fallback for backward compatibility
-      console.log("Initiating Google Sign In...");
     }
   }
 

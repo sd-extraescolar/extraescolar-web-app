@@ -42,7 +42,7 @@ export function useAllGoogleSubmissions(
           let nextPageToken: string | undefined = undefined;
           
           do {
-            const response = await (window as any).gapi.client.classroom.courses.courseWork.studentSubmissions.list({
+            const response: any = await (window as any).gapi.client.classroom.courses.courseWork.studentSubmissions.list({
               courseId,
               courseWorkId: assignment.id,
               pageSize: 100, // Máximo permitido por la API
@@ -53,11 +53,9 @@ export function useAllGoogleSubmissions(
             allSubmissions = [...allSubmissions, ...submissions];
             nextPageToken = response.result.nextPageToken;
             
-            console.log(`Tarea ${assignment.title}: obtenidas ${submissions.length} entregas, total: ${allSubmissions.length}`);
           } while (nextPageToken);
           
           results[assignment.id] = allSubmissions;
-          console.log(`Tarea ${assignment.title}: total de entregas obtenidas: ${allSubmissions.length}`);
         }
         if (!cancelled) setAllSubmissions(results);
       } catch (err) {

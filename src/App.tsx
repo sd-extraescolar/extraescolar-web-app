@@ -1,9 +1,19 @@
 import { SEO } from "@/components/SEO";
+import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
 import { AppRoutes } from "@/routes/AppRoutes";
 import { BrowserRouter as Router } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
+  );
+}
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -14,16 +24,6 @@ function AppContent() {
       <AppRoutes isAuthenticated={isAuthenticated} isLoading={isLoading} />
       <Toaster />
     </>
-  );
-}
-
-function App() {
-  return (
-    <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
   );
 }
 

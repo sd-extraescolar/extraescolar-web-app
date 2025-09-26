@@ -27,26 +27,15 @@ export function StudentList({ students, assignmentTitle, getGradeColor, handleSe
   const pastelSinCalificar = "bg-gray-500"; // gris oscuro para sin calificar
 
 
-  console.log("students", students)
 
   return (
     <div className="grid gap-4 custom:grid-cols-2 custom:grid-cols-1">
       {students.map((student) => {
-        // Debug: verificar el estado del estudiante
-        console.log(`\n=== ESTUDIANTE: ${student.name} ===`);
-        console.log(`submitted: ${student.submitted}`);
-        console.log(`grade: ${student.grade}`);
-        console.log(`grade type: ${typeof student.grade}`);
-        console.log(`grade === undefined: ${student.grade === undefined}`);
-        console.log(`grade === null: ${student.grade === null}`);
-        console.log(`typeof student.grade === 'number': ${typeof student.grade === 'number'}`);
-        
         // PRIORIDAD UI: 1-Calificados, 2-Entregados sin calificar, 3-Pendientes
         let statusColor = pastelCorregida;
         
         // PRIORIDAD 1: CALIFICADOS (mostrar estado de calificación)
         if (student.submitted && typeof student.grade === 'number') {
-          console.log(`  -> CALIFICADO: ${student.name}`);
           if (student.grade >= 70) {
             statusColor = pastelCorregida; // Verde - Aprobado
           } else {
@@ -55,16 +44,11 @@ export function StudentList({ students, assignmentTitle, getGradeColor, handleSe
         } 
         // PRIORIDAD 2: ENTREGADO PERO SIN CALIFICAR (priorizar calificar)
         else if (student.submitted && (student.grade === undefined || student.grade === null)) {
-          console.log(`  -> SIN CALIFICAR: ${student.name}`);
           statusColor = pastelSinCalificar; // Gris oscuro - Necesita calificación
         } 
         // PRIORIDAD 3: PENDIENTES (priorizar pendiente)
         else if (!student.submitted) {
-          console.log(`  -> PENDIENTE: ${student.name}`);
           statusColor = pastelNoEntregada; // AMARILLO - Necesita entregar
-        }
-        else {
-          console.log(`  -> FALLBACK: ${student.name} - submitted: ${student.submitted}, grade: ${student.grade}`);
         }
         return (
           <div

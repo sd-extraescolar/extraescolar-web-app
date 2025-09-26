@@ -127,7 +127,6 @@ export class AuthStorage<T extends AuthData = AuthData> {
     if (data.accessToken && data.isAuthenticated) {
       const isValid = await this.isTokenValid(data.accessToken);
       if (!isValid) {
-        console.log('Token expirado, limpiando datos de autenticación');
         this.clear();
         return false;
       }
