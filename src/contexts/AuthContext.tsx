@@ -11,11 +11,19 @@ interface Course {
   enrollmentCode?: string;
 }
 
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  picture?: string;
+}
+
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   courses: Course[];
   selectedCourse: Course | null;
+  userProfile: UserProfile | null;
   error: string | null;
   handleLogin: () => Promise<void>;
   handleLogout: () => Promise<void>;
@@ -33,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isSignedIn,
     isLoading,
     courses,
+    userProfile,
     error,
     handleLogin,
     handleLogout,
@@ -68,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading: isLoading || !isGapiReady,
     courses,
     selectedCourse,
+    userProfile,
     error,
     handleLogin,
     handleLogout,
