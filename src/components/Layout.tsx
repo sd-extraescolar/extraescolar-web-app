@@ -22,16 +22,22 @@ export const Layout = ({ children }: LayoutProps) => {
     setIsSidebarOpen(false);
   };
 
-  // Handle menu click - different behavior for mobile vs desktop
+  // Handle menu click - different behavior for mobile vs tablet vs desktop
   const handleMenuClick = () => {
-    // On mobile: toggle sidebar open/close
-    if (window.innerWidth < 1024) {
+    const width = window.innerWidth;
+    
+    if (width < 768) {
+      // Mobile: toggle floating drawer
       toggleSidebar();
+    } else if (width < 1024) {
+      // Tablet: drawer is always visible but minimized
+      return; // No action needed, drawer is always shown minimized
     } else {
-      // On desktop: toggle sidebar expanded/collapsed
+      // Desktop: toggle sidebar expanded/collapsed
       toggleSidebarExpanded();
     }
   };
+
 
   return (
     <>
@@ -40,22 +46,27 @@ export const Layout = ({ children }: LayoutProps) => {
         onMenuClick={handleMenuClick}
       />
       
-      {/* Backdrop for mobile */}
+      {/* Backdrop for mobile only */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
           onClick={closeSidebar}
         />
       )}
       
       {/* Layout Container - Horizontal Flex with top margin for fixed header */}
       <div className="flex h-screen pt-16">
-        {/* Sidebar */}
-        <Sidebar 
-          isOpen={isSidebarOpen} 
-          isExpanded={isSidebarExpanded} 
-          onClose={toggleSidebar} 
-        />
+        {/* Sidebar - Different behavior per screen size */}
+        <div className={`
+          ${isSidebarOpen ? 'fixed top-16 bottom-0 left-0 z-50 md:hidden' : 'hidden md:block lg:block'}
+          h-full flex flex-col
+        `}>
+          <Sidebar 
+            isOpen={isSidebarOpen} 
+            isExpanded={isSidebarExpanded} 
+            onClose={toggleSidebar} 
+          />
+        </div>
         
         {/* Main Content */}
         <main className="flex-1 bg-white rounded-tl-3xl overflow-y-auto p-8">
