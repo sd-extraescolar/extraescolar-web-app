@@ -147,7 +147,6 @@ export function useGradeManagementData() {
 
   const handleSendNotification = async (studentEmail: string, assignmentTitle: string) => {
     // Simulate sending email notification
-    console.log(`Sending notification to ${studentEmail} for ${assignmentTitle}`);
     // Here you would integrate with your email service
   };
 

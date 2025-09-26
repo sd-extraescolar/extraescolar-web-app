@@ -25,7 +25,6 @@ export function useGoogleRoster(courseId: string | undefined) {
     
     (async () => {
       try {
-        console.log('Obteniendo roster del curso:', courseId);
         
         // Verificar que el token esté establecido
         const token = (window as any).gapi.client.getToken();
@@ -38,7 +37,7 @@ export function useGoogleRoster(courseId: string | undefined) {
         let nextPageToken: string | undefined = undefined;
         
         do {
-          const response = await (window as any).gapi.client.classroom.courses.students.list({
+          const response: any = await (window as any).gapi.client.classroom.courses.students.list({
             courseId,
             pageSize: 100, // Máximo permitido por la API
             pageToken: nextPageToken,
@@ -48,10 +47,8 @@ export function useGoogleRoster(courseId: string | undefined) {
           allStudents = [...allStudents, ...students];
           nextPageToken = response.result.nextPageToken;
           
-          console.log(`Obtenidos ${students.length} estudiantes, total: ${allStudents.length}`);
         } while (nextPageToken);
         
-        console.log(`Total de estudiantes obtenidos: ${allStudents.length}`);
         
         const studentsWithProfiles: StudentProfile[] = allStudents.map((student: any) => ({
           id: student.userId,

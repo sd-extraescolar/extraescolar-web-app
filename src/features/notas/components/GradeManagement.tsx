@@ -66,7 +66,7 @@ export function GradeManagement() {
 	const { allSubmissions, loading: loadingSubmissions, error: errorSubmissions } = useAllGoogleSubmissions(selectedCourse?.id, assignments);
 	
 	// Obtener la lista de estudiantes del curso (roster)
-	const { students: rosterStudents, loading: loadingRoster, error: errorRoster } = useGoogleRoster(selectedCourse?.id);
+	const { students: rosterStudents } = useGoogleRoster(selectedCourse?.id);
 
 	// Sincronizar selectedAssignment con tareas reales
 	useEffect(() => {
@@ -77,8 +77,6 @@ export function GradeManagement() {
 
 
 	const {
-		totalCursos,
-		totalTareas,
 		totalEntregas,
 		totalPendientes,
 		promedio,
@@ -87,7 +85,6 @@ export function GradeManagement() {
 		realDonutData,
 		realBarTareaData,
 		realBarCelulaData,
-		aprobacionReal,
 		assignmentStats,
 	} = useGradeStats({
 		courses,
@@ -128,8 +125,6 @@ export function GradeManagement() {
 	return (
 		<div>
 			   <StatsCards
-				   totalCursos={totalCursos}
-				   totalTareas={totalTareas}
 				   totalEntregas={totalEntregas}
 				   totalPendientes={totalPendientes}
 				   promedio={promedio}

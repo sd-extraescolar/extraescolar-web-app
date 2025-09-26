@@ -81,12 +81,7 @@ export function useGradeStats({
 
   // Per-assignment stats for all assignments
   const perAssignmentStats = assignments.map(assignment => {
-    console.log(`\n=== PROCESANDO TAREA: ${assignment.title} ===`);
-    console.log('Assignment:', assignment);
-    
     const assignmentSubmissions = allSubmissions[assignment.id] || [];
-    console.log('Assignment submissions:', assignmentSubmissions);
-    console.log('Roster students:', rosterStudents);
     
     // Crear lista de todos los estudiantes del roster, incluyendo los que no entregaron
     const students: Student[] = rosterStudents.map(rosterStudent => {
@@ -105,19 +100,6 @@ export function useGradeStats({
         submissionDate: submission?.updateTime,
       };
       
-      console.log(`\n--- ESTUDIANTE: ${studentData.name} ---`);
-      console.log('Roster student:', rosterStudent);
-      console.log('Submission found:', submission);
-      console.log('Student data:', studentData);
-      console.log(`Estado: submitted=${studentData.submitted}, grade=${studentData.grade}, grade type=${typeof studentData.grade}`);
-      if (submission) {
-        console.log(`Submission state: ${submission.state}`);
-        console.log(`Assigned grade: ${submission.assignedGrade}`);
-        console.log(`Assigned grade type: ${typeof submission.assignedGrade}`);
-        console.log(`Assigned grade === null: ${submission.assignedGrade === null}`);
-        console.log(`Assigned grade === undefined: ${submission.assignedGrade === undefined}`);
-      }
-      console.log(`Max points: ${assignment?.maxPoints}`);
       
       return studentData;
     });

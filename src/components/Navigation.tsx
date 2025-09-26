@@ -47,8 +47,6 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
   const teacherEmail = userProfile?.email || "";
   
   // Debug: Log user profile data
-  console.log('Navigation - userProfile:', userProfile);
-  console.log('Navigation - isAuthenticated:', isAuthenticated);
 
 
   const navigationItems = [

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 export function GoogleSignInButton() {
   const handleSignIn = () => {
     // This would integrate with your Google OAuth flow
-    console.log("Initiating Google Sign In...")
   }
 
   return (

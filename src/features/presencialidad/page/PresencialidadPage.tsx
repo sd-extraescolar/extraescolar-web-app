@@ -1,8 +1,8 @@
-import { AttendanceCalendar } from "../components/AttendanceCalendar";
-import { StudentAttendanceList } from "../components/StudentAttendanceList";
+import { AuthContext } from "@/contexts/AuthContext";
 import { useHybridAttendance } from "@/hooks/useHybridAttendance";
 import { useContext, useEffect } from "react";
-import { AuthContext } from "@/contexts/AuthContext";
+import { AttendanceCalendar } from "../components/AttendanceCalendar";
+import { StudentAttendanceList } from "../components/StudentAttendanceList";
 
 export const PresencialidadPage = () => {
   const authContext = useContext(AuthContext);
@@ -25,7 +25,6 @@ export const PresencialidadPage = () => {
 
   useEffect(() => {
     if (authContext?.selectedCourse && authContext?.fetchStudents) {
-      console.log("Curso seleccionado en PresencialidadPage:", authContext.selectedCourse);
       
       // Obtener estudiantes del curso seleccionado
       authContext.fetchStudents(authContext.selectedCourse.id);
@@ -34,7 +33,6 @@ export const PresencialidadPage = () => {
 
   useEffect(() => {
     if (authContext?.students && authContext.students.length > 0) {
-      console.log("Estudiantes del curso seleccionado:", authContext.students);
     }
   }, [authContext?.students]);
 

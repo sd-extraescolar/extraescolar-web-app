@@ -105,14 +105,11 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
           // Configurar el token en el cliente API
           apiClient.setAccessToken(authContext.accessToken);
           
-          console.log('Cargando eventos para cohorte:', cohorteId);
           
           // Primero intentar sincronizar la cohorte
           try {
             await cohorteService.syncCohorte(cohorteId);
-            console.log('Cohorte sincronizada exitosamente');
           } catch (syncErr) {
-            console.log('Error al sincronizar cohorte (puede que ya exista):', syncErr);
             // Continuar aunque falle la sincronización
           }
           
@@ -123,7 +120,6 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
           setRecords(hybridRecords);
           setLoadedCohorteId(cohorteId);
           
-          console.log('Eventos cargados:', hybridRecords.length);
         } catch (err) {
           console.error('Error loading eventos:', err);
           setError('Error al cargar eventos desde la API');
@@ -141,7 +137,6 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
   useEffect(() => {
     const data: Record<string, { present: number; total: number; percentage: number }> = {};
     
-    console.log('Actualizando datos del calendario con', records.length, 'registros');
     
     records.forEach(record => {
       const dateKey = getDateKey(new Date(record.fecha));
@@ -156,7 +151,6 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
       };
     });
     
-    console.log('Datos del calendario actualizados:', data);
     setCalendarData(data);
   }, [records]);
 
@@ -324,24 +318,19 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
         id => !alumnosPresentesActuales.includes(id)
       );
 
-      console.log('Alumnos agregados:', alumnosAgregados);
-      console.log('Alumnos removidos:', alumnosRemovidos);
 
       // Si hay alumnos agregados, usar markAttendance
       if (alumnosAgregados.length > 0) {
         await apiAttendance.markAttendance(currentRecord.eventoId, alumnosAgregados);
-        console.log('Asistencia marcada para:', alumnosAgregados);
       }
 
       // Si hay alumnos removidos, usar removeAttendance
       if (alumnosRemovidos.length > 0) {
         await apiAttendance.removeAttendance(currentRecord.eventoId, alumnosRemovidos);
-        console.log('Asistencia removida para:', alumnosRemovidos);
       }
 
       // Si no hay cambios, no hacer nada
       if (alumnosAgregados.length === 0 && alumnosRemovidos.length === 0) {
-        console.log('No hay cambios en la asistencia');
         
         // Mostrar notificación informativa
         toast({
@@ -395,7 +384,6 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
       setIsLoading(true);
       setError(null);
 
-      console.log('Eliminando evento:', currentRecord.eventoId);
       
       // Llamar a la API para eliminar el evento
       const success = await apiAttendance.deleteEvento(currentRecord.eventoId);
@@ -404,14 +392,12 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
         // Remover el registro de la lista local inmediatamente
         setRecords(prev => {
           const newRecords = prev.filter(record => record.id !== currentRecord.id);
-          console.log('Registros después de eliminar:', newRecords.length);
           return newRecords;
         });
         
         // También actualizar la lista de eventos en el hook de API
         apiAttendance.removeEventoFromList(currentRecord.eventoId);
         
-        console.log('Evento eliminado exitosamente');
         
         // Mostrar notificación de éxito
         toast({

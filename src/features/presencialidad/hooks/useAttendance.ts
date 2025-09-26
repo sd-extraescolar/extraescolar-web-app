@@ -1,5 +1,5 @@
-import { useCallback, useState, useContext, useEffect } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
 export interface Student {
   id: string;
@@ -198,7 +198,6 @@ export const useAttendance = () => {
     
     if (record) {
       // Aquí se haría la llamada a la API para sincronizar
-      console.log('Saving attendance for date:', dateKey, record);
       
       // Simular llamada a API
       // await api.saveAttendance(record);

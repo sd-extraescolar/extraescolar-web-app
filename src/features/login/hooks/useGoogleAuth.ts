@@ -110,8 +110,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
   const [currentCourseId, setCurrentCourseId] = useState<string | null>(null);
   
   // Debug: Log saved data
-  console.log('useGoogleAuth - savedData:', savedData);
-  console.log('useGoogleAuth - userProfile from storage:', savedData.userProfile);
   const [error, setError] = useState<string | null>(savedData.error);
   const [isGapiReady, setIsGapiReady] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(savedData.accessToken);
@@ -122,7 +120,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
       if (savedData.accessToken && savedData.isAuthenticated) {
         const isValid = await GoogleAuthUtils.validateSession();
         if (!isValid) {
-          console.log('Token expirado, limpiando datos de autenticación');
           setAccessToken(null);
           setIsSignedIn(false);
           setCourses([]);
@@ -141,7 +138,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
   useEffect(() => {
     const fetchUserProfileIfNeeded = async () => {
       if (isSignedIn && accessToken && !userProfile && window.gapi) {
-        console.log('User is authenticated but no profile data, fetching using Google Sign-In...');
         try {
           // Establecer el token de acceso en GAPI
           window.gapi.client.setToken({ access_token: accessToken });
@@ -152,12 +148,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
             const googleUser = authInstance.currentUser.get();
             const profile = googleUser.getBasicProfile();
             
-            console.log('Fetched user profile on load using Google Sign-In:', {
-              id: profile.getId(),
-              name: profile.getName(),
-              email: profile.getEmail(),
-              imageUrl: profile.getImageUrl()
-            });
             
             const userProfile: UserProfile = {
               id: profile.getId(),
@@ -171,7 +161,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
             GoogleAuthUtils.saveSession(accessToken, courses, userProfile);
           } else {
             // Fallback: usar fetch si Google Sign-In no está disponible
-            console.log('Google Sign-In not available on load, using fetch fallback...');
             const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -183,7 +172,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
             }
             
             const userInfo = await userResponse.json();
-            console.log('Fetched user info on load using fetch (fallback):', userInfo);
             
             const profile: UserProfile = {
               id: userInfo.id,
@@ -257,7 +245,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
     
     // Evitar llamadas duplicadas para el mismo curso
     if (currentCourseId === courseId && students.length > 0) {
-      console.log(`Estudiantes ya cargados para el curso ${courseId}`);
       return;
     }
     
@@ -277,7 +264,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
       setStudents(studentsList);
       setCurrentCourseId(courseId);
       
-      console.log(`Estudiantes obtenidos para el curso ${courseId}:`, studentsList);
     } catch (err) {
       console.error('Error obteniendo estudiantes:', err);
       setError('Error al obtener los estudiantes del curso');
@@ -288,13 +274,11 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
 
   // Callback para el OAuth token
   const handleTokenResponse = useCallback(async (response: { access_token: string }) => {
-    console.log('Token recibido:', response);
     setAccessToken(response.access_token);
     setIsSignedIn(true);
     
     // Obtener perfil del usuario usando Google Sign-In
     try {
-      console.log('Fetching user profile using Google Sign-In...');
       
       // Establecer el token de acceso en GAPI
       window.gapi.client.setToken({ access_token: response.access_token });
@@ -305,12 +289,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
         const googleUser = authInstance.currentUser.get();
         const profile = googleUser.getBasicProfile();
         
-        console.log('User profile from Google Sign-In:', {
-          id: profile.getId(),
-          name: profile.getName(),
-          email: profile.getEmail(),
-          imageUrl: profile.getImageUrl()
-        });
         
         const userProfile: UserProfile = {
           id: profile.getId(),
@@ -319,14 +297,12 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
           picture: profile.getImageUrl(),
         };
         
-        console.log('Created profile:', userProfile);
         setUserProfile(userProfile);
         
         // Persistir datos de autenticación
         GoogleAuthUtils.saveSession(response.access_token, [], userProfile);
       } else {
         // Fallback: usar fetch si Google Sign-In no está disponible
-        console.log('Google Sign-In not available, using fetch fallback...');
         const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
           headers: {
             'Authorization': `Bearer ${response.access_token}`,
@@ -338,7 +314,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
         }
         
         const userInfo = await userResponse.json();
-        console.log('User info from Google API (fallback):', userInfo);
         
         const profile: UserProfile = {
           id: userInfo.id,
@@ -347,7 +322,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
           picture: userInfo.picture,
         };
         
-        console.log('Created profile (fallback):', profile);
         setUserProfile(profile);
         
         // Persistir datos de autenticación
