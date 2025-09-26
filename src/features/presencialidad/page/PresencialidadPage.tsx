@@ -1,22 +1,42 @@
 import { AttendanceCalendar } from "../components/AttendanceCalendar";
 import { StudentAttendanceList } from "../components/StudentAttendanceList";
-import { useAttendance } from "../hooks/useAttendance";
+import { useHybridAttendance } from "@/hooks/useHybridAttendance";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 
 export const PresencialidadPage = () => {
+  const authContext = useContext(AuthContext);
   const {
     selectedDate,
-    currentStudents,
-    currentStats,
+    getCurrentStudents,
+    getCurrentStats,
     hasCurrentRecord,
     selectDate,
     toggleStudentStatus,
-    createAttendanceRecord,
-    saveAttendance,
+    createRecord,
+    saveRecord,
+    deleteRecord,
     selectAll,
     unselectAll,
+    downloadEventCSV,
     calendarAttendanceData,
-    pendingChanges
-  } = useAttendance();
+    pendingChanges,
+  } = useHybridAttendance();
+
+  useEffect(() => {
+    if (authContext?.selectedCourse && authContext?.fetchStudents) {
+      console.log("Curso seleccionado en PresencialidadPage:", authContext.selectedCourse);
+      
+      // Obtener estudiantes del curso seleccionado
+      authContext.fetchStudents(authContext.selectedCourse.id);
+    }
+  }, [authContext?.selectedCourse?.id, authContext?.fetchStudents, authContext]);
+
+  useEffect(() => {
+    if (authContext?.students && authContext.students.length > 0) {
+      console.log("Estudiantes del curso seleccionado:", authContext.students);
+    }
+  }, [authContext?.students]);
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -44,12 +64,14 @@ export const PresencialidadPage = () => {
         <div className="min-h-0 overflow-hidden">
           <StudentAttendanceList
             selectedDate={selectedDate}
-            students={currentStudents}
+            students={getCurrentStudents()}
             onStudentStatusChange={toggleStudentStatus}
-            onCreateRecord={createAttendanceRecord}
-            onSaveAttendance={saveAttendance}
+            onCreateRecord={createRecord}
+            onSaveAttendance={saveRecord}
+            onDeleteEvent={deleteRecord}
+            onDownloadCSV={downloadEventCSV}
             hasAttendanceRecord={hasCurrentRecord}
-            attendanceStats={currentStats}
+            attendanceStats={getCurrentStats()}
             onSelectAll={selectAll}
             onUnselectAll={unselectAll}
           />

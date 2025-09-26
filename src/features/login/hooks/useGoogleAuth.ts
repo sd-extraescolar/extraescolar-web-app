@@ -1,4 +1,4 @@
-import type { Course, UseGoogleAuthReturn, UserProfile } from '@/data';
+import type { Course, UseGoogleAuthReturn, UserProfile, Student } from '@/data';
 import { GoogleAuthUtils } from '@/utils/GoogleAuthStorage';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -9,7 +9,7 @@ const DISCOVERY_DOCS = [
   "https://classroom.googleapis.com/$discovery/rest?version=v1",
 ];
 const SCOPES = 
-  "https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.coursework.me.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
+  "https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.coursework.me.readonly https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
 
 // Declaración de tipos para Google Identity Services y API
 declare global {
@@ -54,6 +54,13 @@ declare global {
                 courses?: Course[];
               };
             }>;
+            students: {
+              list: (params: { courseId: string; pageSize?: number }) => Promise<{
+                result: {
+                  students?: Student[];
+                };
+              }>;
+            };
           };
         };
       };
@@ -86,6 +93,8 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [courses, setCourses] = useState<Course[]>(savedData.courses);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(savedData.userProfile);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [currentCourseId, setCurrentCourseId] = useState<string | null>(null);
   
   // Debug: Log saved data
   console.log('useGoogleAuth - savedData:', savedData);
@@ -104,6 +113,8 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
           setAccessToken(null);
           setIsSignedIn(false);
           setCourses([]);
+          setStudents([]);
+          setCurrentCourseId(null);
           setError('Sesión expirada. Por favor, inicia sesión nuevamente.');
         }
       }
@@ -223,6 +234,41 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
       setIsLoading(false);
     }
   }, [accessToken, userProfile]);
+
+  // Función para obtener estudiantes de un curso
+  const fetchStudents = useCallback(async (courseId: string) => {
+    if (!accessToken || !window.gapi) return;
+    
+    // Evitar llamadas duplicadas para el mismo curso
+    if (currentCourseId === courseId && students.length > 0) {
+      console.log(`Estudiantes ya cargados para el curso ${courseId}`);
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Establecer el token de acceso
+      window.gapi.client.setToken({ access_token: accessToken });
+      
+      const response = await window.gapi.client.classroom.courses.students.list({
+        courseId: courseId,
+        pageSize: 100,
+      });
+      
+      const studentsList = response.result.students || [];
+      setStudents(studentsList);
+      setCurrentCourseId(courseId);
+      
+      console.log(`Estudiantes obtenidos para el curso ${courseId}:`, studentsList);
+    } catch (err) {
+      console.error('Error obteniendo estudiantes:', err);
+      setError('Error al obtener los estudiantes del curso');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accessToken, currentCourseId, students.length]);
 
   // Callback para el OAuth token
   const handleTokenResponse = useCallback(async (response: { access_token: string }) => {
@@ -408,6 +454,8 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
         setIsSignedIn(false);
         setCourses([]);
         setUserProfile(null);
+        setStudents([]);
+        setCurrentCourseId(null);
         
         // Limpiar datos persistidos
         GoogleAuthUtils.clearSession();
@@ -429,5 +477,8 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
     handleLogin,
     handleLogout,
     isGapiReady,
+    students,
+    fetchStudents,
+    accessToken,
   };
 }

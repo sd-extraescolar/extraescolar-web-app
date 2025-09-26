@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useContext, useEffect } from 'react';
+import { AuthContext } from '@/contexts/AuthContext';
 
 export interface Student {
   id: string;
@@ -23,6 +24,8 @@ export interface AttendanceStats {
 }
 
 export const useAttendance = () => {
+  const authContext = useContext(AuthContext);
+  
   // Estado para almacenar todos los registros de asistencia
   const [attendanceRecords, setAttendanceRecords] = useState<Record<string, AttendanceRecord>>({});
   
@@ -32,57 +35,53 @@ export const useAttendance = () => {
   // Estado para rastrear cambios pendientes por fecha
   const [pendingChanges, setPendingChanges] = useState<Record<string, boolean>>({});
 
-  // Lista base de estudiantes (en el futuro vendrá de la API)
-  const baseStudents: Student[] = [
-     {
-       id: '1',
-       name: 'Ana García',
-       email: 'ana.garcia@estudiante.com',
-       status: 'absent',
-     },
-     {
-       id: '2',
-       name: 'Carlos López',
-       email: 'carlos.lopez@estudiante.com',
-       status: 'absent',
-     },
-     {
-       id: '3',
-       name: 'María Rodríguez',
-       email: 'maria.rodriguez@estudiante.com',
-       status: 'absent',
-     },
-     {
-       id: '4',
-       name: 'José Martínez',
-       email: 'jose.martinez@estudiante.com',
-       status: 'absent',
-     },
-     {
-       id: '5',
-       name: 'Laura Sánchez',
-       email: 'laura.sanchez@estudiante.com',
-       status: 'absent',
-     },
-     {
-       id: '6',
-       name: 'Pedro González',
-       email: 'pedro.gonzalez@estudiante.com',
-       status: 'absent',
-     },
-     {
-       id: '7',
-       name: 'Carmen Ruiz',
-       email: 'carmen.ruiz@estudiante.com',
-       status: 'absent',
-     },
-     {
-       id: '8',
-       name: 'Diego Herrera',
-       email: 'diego.herrera@estudiante.com',
-       status: 'absent',
-     }
-  ];
+  // Convertir estudiantes de Google Classroom al formato esperado
+  const getBaseStudents = useCallback((): Student[] => {
+    if (!authContext?.students || authContext.students.length === 0) {
+      // Si no hay estudiantes cargados, devolver array vacío
+      return [];
+    }
+    
+    return authContext.students.map(classroomStudent => ({
+      id: classroomStudent.userId,
+      name: classroomStudent.profile.name.fullName,
+      email: classroomStudent.profile.emailAddress,
+      status: 'absent' as const
+    }));
+  }, [authContext?.students]);
+
+  // Actualizar registros existentes cuando cambien los estudiantes
+  useEffect(() => {
+    if (authContext?.students && authContext.students.length > 0) {
+      const newBaseStudents = getBaseStudents();
+      
+      // Actualizar todos los registros existentes con la nueva lista de estudiantes
+      setAttendanceRecords(prev => {
+        const updated: Record<string, AttendanceRecord> = {};
+        
+        Object.entries(prev).forEach(([dateKey, record]) => {
+          // Crear un mapa de estudiantes existentes por ID
+          const existingStudentsMap = new Map(
+            record.students.map(student => [student.id, student])
+          );
+          
+          // Crear nueva lista combinando estudiantes existentes con nuevos
+          const updatedStudents = newBaseStudents.map(newStudent => {
+            const existingStudent = existingStudentsMap.get(newStudent.id);
+            return existingStudent || newStudent;
+          });
+          
+          updated[dateKey] = {
+            ...record,
+            students: updatedStudents,
+            updatedAt: new Date().toISOString()
+          };
+        });
+        
+        return updated;
+      });
+    }
+  }, [authContext?.students, getBaseStudents]);
 
   // Obtener la fecha en formato string para usar como clave
   const getDateKey = (date: Date): string => {
@@ -99,11 +98,8 @@ export const useAttendance = () => {
     }
     
     // Si no hay registro, devolver estudiantes base con status 'absent'
-    return baseStudents.map(student => ({
-      ...student,
-      status: 'absent' as const
-    }));
-  }, [attendanceRecords]);
+    return getBaseStudents();
+  }, [attendanceRecords, getBaseStudents]);
 
   // Cambiar el estado de un estudiante
   const toggleStudentStatus = useCallback((studentId: string, newStatus: 'present' | 'absent') => {
@@ -144,15 +140,12 @@ export const useAttendance = () => {
       ...prev,
       [dateKey]: {
         date: dateKey,
-         students: baseStudents.map(student => ({
-           ...student,
-           status: 'absent' as const
-         })),
+        students: getBaseStudents(),
         createdAt: now,
         updatedAt: now
       }
     }));
-  }, [selectedDate]);
+  }, [selectedDate, getBaseStudents]);
 
   // Obtener estadísticas para la fecha seleccionada
   const getAttendanceStats = useCallback((date: Date): AttendanceStats => {

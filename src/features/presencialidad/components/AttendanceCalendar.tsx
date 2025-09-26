@@ -24,15 +24,6 @@ export const AttendanceCalendar = ({
 }: AttendanceCalendarProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date);
-  };
-
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -95,12 +86,10 @@ export const AttendanceCalendar = ({
     return attendanceData[dateKey];
   };
 
-  const getAttendanceColor = (percentage: number) => {
-    if (percentage >= 90) return 'bg-education-green-100 text-education-green-700 border-education-green-200';
-    if (percentage >= 70) return 'bg-progress-yellow-100 text-progress-yellow-700 border-progress-yellow-200';
-    return 'bg-alert-red-100 text-alert-red-700 border-alert-red-200';
+  const hasEvent = (date: Date) => {
+    const dateKey = date.toISOString().split('T')[0];
+    return !!attendanceData[dateKey];
   };
-
   // Calcular promedio mensual de presencialidad
   const getMonthlyAverage = () => {
     const year = currentMonth.getFullYear();
@@ -160,7 +149,7 @@ export const AttendanceCalendar = ({
         </div>
       </CardHeader>
       
-      <CardContent className="flex-1 flex flex-col space-y-6">
+      <CardContent className="flex-1 flex flex-col justify-center space-y-6">
         {/* Month Navigation */}
         <div className="flex items-center justify-between">
           <Button
@@ -208,6 +197,7 @@ export const AttendanceCalendar = ({
               const attendance = getAttendanceForDate(day);
               const isCurrentDay = isToday(day);
               const isSelectedDay = isSelected(day);
+              const hasEventForDay = hasEvent(day);
               
               return (
                 <Button
@@ -219,8 +209,8 @@ export const AttendanceCalendar = ({
                     h-10 p-0 relative rounded-lg transition-all duration-200
                     ${isSelectedDay 
                       ? 'bg-digital-blue-50 text-digital-blue-700 border-2 border-digital-blue-400 hover:bg-digital-blue-50 hover:text-digital-blue-700' 
-                      : attendance 
-                        ? 'bg-digital-blue-50 text-digital-blue-600 hover:bg-digital-blue-100 hover:text-digital-blue-700'
+                      : hasEventForDay 
+                        ? 'bg-purple-50 text-purple-600 hover:bg-purple-100 hover:text-purple-700 border border-purple-200'
                         : isCurrentDay 
                           ? 'bg-education-green-50 text-education-green-700 hover:bg-education-green-50 hover:text-education-green-700' 
                           : 'hover:bg-light-gray'
@@ -247,7 +237,7 @@ export const AttendanceCalendar = ({
                     <div className={`
                       absolute -bottom-1 left-1/2 transform -translate-x-1/2
                       w-2 h-2 rounded-full
-                      bg-digital-blue-200
+                      ${hasEventForDay ? 'bg-purple-300' : 'bg-digital-blue-200'}
                     `} />
                   )}
                 </Button>

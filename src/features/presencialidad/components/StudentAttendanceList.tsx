@@ -8,9 +8,11 @@ import {
   Plus,
   Save,
   Square,
+  Trash2,
   Users
 } from "lucide-react";
 import { useState } from "react";
+import { DeleteEventModal } from "@/features/presencialidad/components/DeleteEventModal";
 
 interface Student {
   id: string;
@@ -26,6 +28,8 @@ interface StudentAttendanceListProps {
   onStudentStatusChange: (studentId: string, status: 'present' | 'absent') => void;
   onCreateRecord: () => void;
   onSaveAttendance: () => void;
+  onDeleteEvent?: () => void;
+  onDownloadCSV: () => void;
   hasAttendanceRecord: boolean;
   attendanceStats: {
     present: number;
@@ -43,12 +47,15 @@ export const StudentAttendanceList = ({
   onStudentStatusChange,
   onCreateRecord,
   onSaveAttendance,
+  onDeleteEvent,
+  onDownloadCSV,
   hasAttendanceRecord,
   attendanceStats,
   onSelectAll,
   onUnselectAll
 }: StudentAttendanceListProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('es-ES', {
@@ -65,10 +72,8 @@ export const StudentAttendanceList = ({
 
   // Determinar si todos los estudiantes filtrados están seleccionados
   const allSelected = filteredStudents.length > 0 && filteredStudents.every(student => student.status === 'present');
-  const someSelected = filteredStudents.some(student => student.status === 'present');
   
   // Determinar el modo del botón basado en el estado actual
-  const shouldSelectAll = !allSelected && someSelected;
   const shouldDeselectAll = allSelected;
 
 
@@ -95,33 +100,13 @@ export const StudentAttendanceList = ({
           {hasAttendanceRecord && (
             <div className="flex gap-2">
               <IconButton
-                onClick={() => {
-                  // Función para descargar datos
-                  const data = {
-                    fecha: selectedDate.toISOString().split('T')[0],
-                    estudiantes: students.map(student => ({
-                      nombre: student.name,
-                      email: student.email,
-                      estado: student.status === 'present' ? 'Presente' : 'Ausente'
-                    })),
-                    estadisticas: attendanceStats
-                  };
-                  
-                  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = `asistencia-${selectedDate.toISOString().split('T')[0]}.json`;
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  URL.revokeObjectURL(url);
-                }}
+                onClick={onDownloadCSV}
                 icon={Download}
-                tooltip="Descargar datos"
+                tooltip="Descargar CSV de asistencia"
                 size="default"
                 variant="outline"
-                className="w-10 h-10 border border-education-green-300 text-education-green-600 bg-transparent hover:bg-education-green-50"
+                disabled={false}
+                className="w-10 h-10 border border-digital-blue-300 text-digital-blue-600 bg-transparent hover:bg-digital-blue-50 hover:border-digital-blue-400"
               />
               <Button
                 onClick={onSaveAttendance}
@@ -131,6 +116,15 @@ export const StudentAttendanceList = ({
               >
                 <Save className="w-4 h-4" />
                 Guardar
+              </Button>
+              <Button
+                onClick={() => setShowDeleteModal(true)}
+                variant="outline"
+                size="default"
+                className="w-24 h-10 bg-red-500 text-white border-red-500 hover:bg-red-600 hover:border-red-600 hover:text-white flex items-center gap-1 px-4"
+              >
+                <Trash2 className="w-4 h-4" />
+                Borrar
               </Button>
             </div>
           )}
@@ -261,6 +255,15 @@ export const StudentAttendanceList = ({
           </>
         )}
       </CardContent>
+      
+      {/* Delete Event Modal */}
+      {showDeleteModal && onDeleteEvent && (
+        <DeleteEventModal
+          selectedDate={selectedDate}
+          onConfirm={onDeleteEvent}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
     </Card>
   );
 };

@@ -86,7 +86,9 @@ export const IconButton = ({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            {buttonElement}
+            <div className={disabled ? 'cursor-not-allowed' : ''}>
+              {buttonElement}
+            </div>
           </TooltipTrigger>
           <TooltipContent>
             <p>{tooltip}</p>
