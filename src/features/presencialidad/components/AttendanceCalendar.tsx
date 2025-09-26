@@ -24,14 +24,6 @@ export const AttendanceCalendar = ({
 }: AttendanceCalendarProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date);
-  };
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -95,11 +87,6 @@ export const AttendanceCalendar = ({
     return attendanceData[dateKey];
   };
 
-  const getAttendanceColor = (percentage: number) => {
-    if (percentage >= 90) return 'bg-education-green-100 text-education-green-700 border-education-green-200';
-    if (percentage >= 70) return 'bg-progress-yellow-100 text-progress-yellow-700 border-progress-yellow-200';
-    return 'bg-alert-red-100 text-alert-red-700 border-alert-red-200';
-  };
 
   // Calcular promedio mensual de presencialidad
   const getMonthlyAverage = () => {
