@@ -160,6 +160,64 @@ className="border-progress-yellow-200 bg-progress-yellow-50 text-progress-yellow
 - **Ring**: Verde Educativo (`ring-education-green`)
 - **Outline**: 2px sólido con offset
 
+## Estilos Globales de Navegación
+
+### Clases CSS Reutilizables
+
+#### Elementos de Navegación Base
+```css
+.nav-item                    /* Elemento base de navegación */
+.nav-item-inactive          /* Estado inactivo */
+.nav-item-dashboard         /* Dashboard activo */
+.nav-item-grades            /* Gestión de Notas activo */
+.nav-item-attendance        /* Presencialidad activo */
+```
+
+#### Iconos de Navegación
+```css
+.nav-icon                   /* Icono base */
+.nav-icon-dashboard         /* Icono Dashboard */
+.nav-icon-grades            /* Icono Gestión de Notas */
+.nav-icon-attendance        /* Icono Presencialidad */
+.nav-icon-inactive          /* Icono inactivo */
+```
+
+#### Contenedores de Layout
+```css
+.sidebar-container          /* Contenedor del sidebar */
+.sidebar-nav               /* Navegación del sidebar */
+.sidebar-nav-list          /* Lista de navegación */
+.main-content-container     /* Contenedor principal con bordes redondeados */
+.main-content-scrollable    /* Contenido scrolleable */
+```
+
+### Uso de Clases Globales
+
+#### Ejemplo de Navegación
+```jsx
+<Button className="nav-item nav-item-dashboard">
+  <Icon className="nav-icon nav-icon-dashboard" />
+  <span>Dashboard</span>
+</Button>
+```
+
+#### Ejemplo de Layout
+```jsx
+<div className="sidebar-container">
+  <nav className="sidebar-nav">
+    <div className="sidebar-nav-list">
+      {/* Navigation items */}
+    </div>
+  </nav>
+</div>
+
+<div className="main-content-container">
+  <main className="main-content-scrollable">
+    {/* Page content */}
+  </main>
+</div>
+```
+
 ## Archivos de Branding
 
 ### Iconos

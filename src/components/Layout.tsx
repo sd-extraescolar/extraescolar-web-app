@@ -1,72 +1,73 @@
-import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Header } from "./Header";
+import { Sidebar } from "./Navigation";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export const Layout = ({ children }: LayoutProps) => {
-  const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const toggleSidebarExpanded = () => {
+    setIsSidebarExpanded(!isSidebarExpanded);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
+  // Handle menu click - different behavior for mobile vs desktop
+  const handleMenuClick = () => {
+    // On mobile: toggle sidebar open/close
+    if (window.innerWidth < 1024) {
+      toggleSidebar();
+    } else {
+      // On desktop: toggle sidebar expanded/collapsed
+      toggleSidebarExpanded();
+    }
+  };
+
+  const handleCohortChange = (cohortId: string) => {
+    console.log(`Cambiando a cohorte: ${cohortId}`);
+    // Aquí implementarías la lógica para cambiar de cohorte
+  };
   
   return (
-    <div className="min-h-screen bg-background">
-      <header className="dark:from-education-green-950/20 dark:to-digital-blue-950/20 border-b bg-gradient-to-r from-education-green-50 to-digital-blue-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="space-y-6 text-center">
-            <Link to="/">
-              <h1 className="bg-gradient-to-r from-education-green-600 to-digital-blue-600 bg-clip-text text-4xl font-bold text-transparent hover:opacity-80 transition-opacity">
-                Extraescolar
-              </h1>
-            </Link>
-            <p className="mx-auto max-w-3xl text-xl text-muted-foreground">
-              Complementa{" "}
-              <span className="font-semibold text-digital-blue-600">
-                Google Classroom
-              </span>{" "}
-              con una capa de administración y visualización inteligente
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Diseñado especialmente para profesores, estudiantes y
-              coordinadores
-            </p>
-            
-            {/* Simple Navigation */}
-            <nav className="flex justify-center gap-6 pt-4">
-              <Link
-                to="/"
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  location.pathname === '/'
-                    ? 'bg-education-green text-white'
-                    : 'text-education-green-700 hover:bg-education-green-100'
-                }`}
-              >
-                Inicio
-              </Link>
-              <Link
-                to="/about"
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  location.pathname === '/about'
-                    ? 'bg-digital-blue text-white'
-                    : 'text-digital-blue-700 hover:bg-digital-blue-100'
-                }`}
-              >
-                Acerca de
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        {children}
-      </main>
-
-      <footer className="mt-auto border-t bg-muted/50">
-        <div className="container mx-auto px-4 py-6">
-          <p className="text-center text-sm text-muted-foreground">
-            © 2024 Extraescolar. Todos los derechos reservados.
-          </p>
-        </div>
-      </footer>
-    </div>
+    <>
+      {/* Header */}
+      <Header 
+        onMenuClick={handleMenuClick}
+        onCohortChange={handleCohortChange}
+      />
+      
+      {/* Backdrop for mobile */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+      
+      {/* Layout Container - Horizontal Flex with top margin for fixed header */}
+      <div className="flex h-screen pt-16">
+        {/* Sidebar */}
+        <Sidebar 
+          isOpen={isSidebarOpen} 
+          isExpanded={isSidebarExpanded} 
+          onClose={toggleSidebar} 
+        />
+        
+        {/* Main Content */}
+        <main className="flex-1 bg-white rounded-tl-3xl overflow-y-auto p-8">
+          {children}
+        </main>
+      </div>
+    </>
   );
 };

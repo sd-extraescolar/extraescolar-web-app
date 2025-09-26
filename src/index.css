@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 @layer base {
   :root {
     /* Extraescolar Light Theme */
@@ -61,11 +62,233 @@
   }
 }
 
+
 @layer base {
   * {
     @apply border-border;
   }
+  
+  html {
+    @apply w-full h-full;
+    overflow-x: hidden;
+  }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-light-blue-gray text-foreground w-screen h-screen;
+    overflow-x: hidden;
+  }
+  
+  #root {
+    @apply w-screen h-screen flex flex-col overflow-hidden;
+  }
+}
+
+@layer components {
+  
+  /* Material You style components */
+  .material-header {
+    @apply fixed top-0 left-0 right-0 h-16 bg-light-blue-gray flex items-center px-4 z-50;
+  }
+  
+  .material-sidebar {
+    @apply w-72 bg-light-blue-gray pt-16 flex flex-col fixed top-0 left-0 h-full z-40;
+  }
+  
+  .material-sidebar-item {
+    @apply w-full justify-start gap-4 h-12 px-4 rounded-full font-normal text-dark-text transition-all duration-200;
+  }
+  
+  .material-sidebar-item:hover {
+    @apply bg-sidebar-hover;
+  }
+  
+  .material-sidebar-item.active {
+    @apply bg-sidebar-hover text-education-green hover:bg-sidebar-hover;
+  }
+  
+  .material-sidebar-item.active.blue {
+    @apply bg-sidebar-hover text-digital-blue hover:bg-sidebar-hover;
+  }
+  
+  .material-sidebar-item.active.gray {
+    @apply bg-sidebar-hover text-medium-gray hover:bg-sidebar-hover;
+  }
+  
+  /* Google Classroom-style navigation */
+  .google-nav-item {
+    @apply relative flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  }
+  
+  .google-nav-item:hover {
+    @apply bg-white/80;
+  }
+  
+  .google-nav-item.active {
+    @apply bg-white text-education-green-600 border border-education-green-200;
+  }
+  
+  .google-nav-item.active::after {
+    content: '';
+    @apply absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-education-green-600 rounded-full;
+  }
+  
+  /* Google-style drawer */
+  .google-drawer {
+    @apply bg-white border-r border-gray-200;
+  }
+  
+  .google-drawer-item {
+    @apply flex items-center p-3 rounded-lg font-medium transition-all duration-200 relative;
+  }
+  
+  .google-drawer-item:hover {
+    @apply bg-gray-50;
+  }
+  
+  .google-drawer-item.active {
+    @apply bg-education-green-50 text-education-green-600 border border-education-green-200;
+  }
+  
+  .google-drawer-item.active::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-1 rounded-r-full;
+  }
+  
+  /* Google-style cards */
+  .google-card {
+    @apply bg-white rounded-3xl border border-gray-200 transition-colors duration-200;
+  }
+  
+  /* Google-style buttons */
+  .google-button {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .google-button-primary {
+    @apply google-button bg-education-green-600 text-white hover:bg-education-green-700 focus:ring-education-green-500;
+  }
+  
+  .google-button-secondary {
+    @apply google-button bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-education-green-500;
+  }
+  
+  /* Google-style top bar */
+  .google-top-bar {
+    @apply bg-light-blue-gray;
+  }
+  
+  /* Google-style backdrop */
+  .google-backdrop {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm;
+  }
+  
+  /* Google Classroom style content container */
+  .material-content {
+    @apply bg-white p-6;
+    border-radius: 8px !important;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Google Classroom exact style */
+  .google-classroom-content {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #dadce0;
+    box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+    padding: 24px;
+    margin: 0;
+  }
+  
+  /* Main content with persistent rounded corners */
+  .main-content-rounded {
+    background: #ffffff;
+    border-radius: 1.5rem 0 0 0;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .main-content-rounded::before {
+    content: '';
+    position: fixed;
+    top: 4rem;
+    left: 18rem;
+    right: 0;
+    height: 1.5rem;
+    background: #ffffff;
+    border-radius: 1.5rem 0 0 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+  
+  /* Global Navigation Styles - Reusable Components */
+  
+  /* Base navigation item */
+  .nav-item {
+    @apply w-full justify-start gap-4 h-12 px-4 rounded-full font-normal transition-all duration-200;
+  }
+  
+  /* Navigation item states */
+  .nav-item-inactive {
+    @apply text-dark-text hover:bg-sidebar-hover;
+  }
+  
+  /* Dashboard navigation item */
+  .nav-item-dashboard {
+    @apply bg-digital-blue-50 text-digital-blue hover:bg-digital-blue-100 hover:text-digital-blue;
+  }
+  
+  /* Grades navigation item */
+  .nav-item-grades {
+    @apply bg-progress-yellow-100 text-progress-yellow-600 hover:bg-progress-yellow-200 hover:text-progress-yellow-600;
+  }
+  
+  /* Attendance navigation item */
+  .nav-item-attendance {
+    @apply bg-alert-red-50 text-alert-red-600 hover:bg-alert-red-100 hover:text-alert-red-600;
+  }
+  
+  /* Navigation icons */
+  .nav-icon {
+    @apply h-5 w-5;
+  }
+  
+  .nav-icon-dashboard {
+    @apply text-digital-blue group-hover:text-digital-blue;
+  }
+  
+  .nav-icon-grades {
+    @apply text-progress-yellow-600 group-hover:text-progress-yellow-600;
+  }
+  
+  .nav-icon-attendance {
+    @apply text-alert-red-600 group-hover:text-alert-red-600;
+  }
+  
+  .nav-icon-inactive {
+    @apply text-medium-gray;
+  }
+  
+  /* Sidebar container */
+  .sidebar-container {
+    @apply w-72 bg-light-blue-gray pt-16 flex flex-col fixed top-0 left-0 h-full z-40;
+  }
+  
+  /* Sidebar navigation */
+  .sidebar-nav {
+    @apply flex-1 p-4;
+  }
+  
+  .sidebar-nav-list {
+    @apply space-y-1;
+  }
+  
+  /* Main content container with rounded corners */
+  .main-content-container {
+    @apply fixed top-16 left-72 right-0 bottom-0 bg-white rounded-tl-3xl overflow-hidden z-10;
+  }
+  
+  .main-content-scrollable {
+    @apply h-full overflow-y-auto p-8;
   }
 }

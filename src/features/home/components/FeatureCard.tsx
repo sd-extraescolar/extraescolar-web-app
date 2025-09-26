@@ -16,7 +16,7 @@ export const FeatureCard = ({
   return (
     <div
       className={cn(
-        "group rounded-lg border border-light-gray bg-white p-6 shadow-sm transition-all hover:border-education-green-200 hover:shadow-lg dark:border-border dark:bg-card",
+        "group rounded-lg border border-light-gray bg-white p-6 transition-all hover:border-education-green-200 hover:bg-gray-50 dark:border-border dark:bg-card",
         className
       )}
     >

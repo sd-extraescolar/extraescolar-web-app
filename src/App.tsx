@@ -1,21 +1,26 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { HomePage } from "@/features/home/page/HomePage";
-import { AboutPage } from "@/features/about/page/AboutPage";
 import { SEO } from "@/components/SEO";
-import { Layout } from "@/components/Layout";
-import { NotFound } from "@/components/NotFound";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
+import { AppRoutes } from "@/routes/AppRoutes";
+import { BrowserRouter as Router } from "react-router-dom";
+
+function AppContent() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  return (
+    <>
+      <SEO />
+      <AppRoutes isAuthenticated={isAuthenticated} isLoading={isLoading} />
+    </>
+  );
+}
 
 function App() {
   return (
     <Router>
-      <SEO />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }
