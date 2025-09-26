@@ -24,6 +24,7 @@ export const AttendanceCalendar = ({
 }: AttendanceCalendarProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
+
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -90,6 +91,7 @@ export const AttendanceCalendar = ({
     const dateKey = date.toISOString().split('T')[0];
     return !!attendanceData[dateKey];
   };
+
   // Calcular promedio mensual de presencialidad
   const getMonthlyAverage = () => {
     const year = currentMonth.getFullYear();
