@@ -18,6 +18,7 @@ export const PresencialidadPage = () => {
     deleteRecord,
     selectAll,
     unselectAll,
+    downloadEventCSV,
     calendarAttendanceData,
     pendingChanges,
   } = useHybridAttendance();
@@ -68,6 +69,7 @@ export const PresencialidadPage = () => {
             onCreateRecord={createRecord}
             onSaveAttendance={saveRecord}
             onDeleteEvent={deleteRecord}
+            onDownloadCSV={downloadEventCSV}
             hasAttendanceRecord={hasCurrentRecord}
             attendanceStats={getCurrentStats()}
             onSelectAll={selectAll}

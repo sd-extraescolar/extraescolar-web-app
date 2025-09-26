@@ -40,6 +40,7 @@ export interface UseHybridAttendanceReturn {
   deleteRecord: () => Promise<void>;
   selectAll: () => void;
   unselectAll: () => void;
+  downloadEventCSV: () => void;
   
   // Utilidades
   getCurrentRecord: () => HybridAttendanceRecord | null;
@@ -491,6 +492,64 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
     setError(null);
   }, []);
 
+  // Generar y descargar CSV del evento actual
+  const downloadEventCSV = useCallback(() => {
+    const currentRecord = getCurrentRecord();
+    
+    if (!currentRecord) {
+      toast({
+        title: "Error",
+        description: "No hay registro de asistencia para esta fecha",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Obtener información del cohorte y fecha
+    const cohorteName = authContext?.selectedCourse?.name || 'Curso no especificado';
+    const fechaFormateada = selectedDate.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+
+    // Crear encabezados del CSV
+    const headers = ['Cohorte', 'Fecha', 'Nombre', 'Email', 'Estado'];
+    
+    // Crear filas de datos
+    const rows = currentRecord.estudiantes.map(student => [
+      cohorteName,
+      fechaFormateada,
+      student.name,
+      student.email,
+      student.status === 'present' ? 'Presente' : 'Ausente'
+    ]);
+    
+    // Combinar encabezados y datos
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+    
+    // Crear archivo y descargarlo
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `asistencia_${selectedDate.toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Mostrar notificación de éxito
+    toast({
+      title: "CSV descargado",
+      description: `Archivo de asistencia descargado para ${selectedDate.toLocaleDateString('es-ES')}`,
+    });
+  }, [getCurrentRecord, selectedDate, authContext?.selectedCourse?.name, toast]);
+
 
   return {
     // Estado
@@ -507,6 +566,7 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
     deleteRecord,
     selectAll,
     unselectAll,
+    downloadEventCSV,
     
     // Utilidades
     getCurrentRecord,

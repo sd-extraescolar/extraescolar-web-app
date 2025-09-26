@@ -29,6 +29,7 @@ interface StudentAttendanceListProps {
   onCreateRecord: () => void;
   onSaveAttendance: () => void;
   onDeleteEvent?: () => void;
+  onDownloadCSV: () => void;
   hasAttendanceRecord: boolean;
   attendanceStats: {
     present: number;
@@ -47,6 +48,7 @@ export const StudentAttendanceList = ({
   onCreateRecord,
   onSaveAttendance,
   onDeleteEvent,
+  onDownloadCSV,
   hasAttendanceRecord,
   attendanceStats,
   onSelectAll,
@@ -98,16 +100,13 @@ export const StudentAttendanceList = ({
           {hasAttendanceRecord && (
             <div className="flex gap-2">
               <IconButton
-                onClick={() => {
-                  // Función deshabilitada - en desarrollo
-                  console.log('Función de descarga en desarrollo');
-                }}
+                onClick={onDownloadCSV}
                 icon={Download}
-                tooltip="Función en desarrollo - Próximamente disponible"
+                tooltip="Descargar CSV de asistencia"
                 size="default"
                 variant="outline"
-                disabled={true}
-                className="w-10 h-10 border border-gray-300 text-gray-400 bg-transparent cursor-not-allowed opacity-50"
+                disabled={false}
+                className="w-10 h-10 border border-digital-blue-300 text-digital-blue-600 bg-transparent hover:bg-digital-blue-50 hover:border-digital-blue-400"
               />
               <Button
                 onClick={onSaveAttendance}
