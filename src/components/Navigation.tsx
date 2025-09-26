@@ -85,7 +85,10 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
 
 
   return (
-    <div className="bg-light-blue-gray flex flex-col z-40 h-full w-auto">
+    <div className={cn(
+      "bg-light-blue-gray flex flex-col z-40 w-auto",
+      isOpen ? "h-[calc(100vh-4rem)]" : "h-full"
+    )}>
       <nav className="flex-1 p-4">
         <div className="space-y-2">
           {navigationItems.map((item) => {
@@ -140,15 +143,14 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
       </nav>
 
       {/* Footer Section */}
-      <div className="mt-auto p-4 border-t border-gray-200 space-y-2">
+      <div className="mt-auto p-4 border-t border-gray-200 space-y-2 flex-shrink-0">
         {/* Logout Button */}
         <button
           onClick={handleLogout}
           disabled={isLoading}
           className={cn(
             "h-12 rounded-full font-normal flex items-center",
-            "justify-start w-full",
-            showText ? "gap-4 px-4" : "px-4 min-w-12",
+            showText ? "justify-start w-full gap-4 px-4" : "justify-center w-12",
             "text-red-500 bg-red-100 hover:bg-red-200 hover:text-red-600",
             isLoading && "opacity-50 cursor-not-allowed"
           )}
@@ -167,8 +169,7 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
         <button 
           className={cn(
             "h-12 rounded-full font-normal flex items-center hover:bg-sidebar-hover",
-            "justify-start w-full",
-            showText ? "gap-4 px-4" : "px-4 min-w-12"
+            showText ? "justify-start w-full gap-4 px-4" : "justify-center w-12"
           )}
         >
               <div className="flex items-center w-5 h-5 flex-shrink-0">
