@@ -16,6 +16,8 @@ export default {
         // Extraescolar Brand Colors
         'education-green': {
           DEFAULT: '#2ECC71',
+          25: '#F4FCF7',
+          30: '#EBF5EE',
           50: '#E8F8F0',
           100: '#D1F2E1',
           200: '#A3E5C3',
@@ -29,6 +31,9 @@ export default {
         },
         'digital-blue': {
           DEFAULT: '#3498DB',
+          20: '#F8FAFD',
+          25: '#F4F8FC',
+          30: '#E8F2F8',
           50: '#EBF5FD',
           100: '#D6EFFF',
           200: '#ADE0FF',
@@ -68,6 +73,7 @@ export default {
         },
         'dark-text': '#2C3E50',
         'medium-gray': '#95A5A6',
+        'light-medium-gray': '#BDC3C7',
         'light-gray': '#ECF0F1',
         'light-blue-gray': '#F8FAFB',
         'sidebar-hover': '#F1F3F4',
