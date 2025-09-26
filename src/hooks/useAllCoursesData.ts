@@ -35,7 +35,7 @@ export function useAllCoursesData() {
         if (!student) return;
 
         // Determinar estado basado en submission y grade
-        if (submission.state === 'TURNED_IN' || submission.state === 'RETURNED') {
+        if (submission.state === 'TURNED_IN' || submission.state === 'RETURNED' || submission.state === 'CREATED') {
           if (submission.assignedGrade !== undefined && submission.assignedGrade !== null) {
             corregida++;
           } else {

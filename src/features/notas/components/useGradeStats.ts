@@ -48,7 +48,7 @@ export function useGradeStats({
   
   // Calcular entregas totales basadas en submissions reales
   const totalEntregas = Object.values(allSubmissions || {}).reduce((acc, submissions) => {
-    return acc + submissions.filter(s => s.state === 'TURNED_IN' || s.state === 'RETURNED').length;
+    return acc + submissions.filter(s => s.state === 'TURNED_IN' || s.state === 'RETURNED' || s.state === 'CREATED').length;
   }, 0);
   
   // Calcular pendientes basados en estudiantes del roster vs entregas
@@ -98,7 +98,7 @@ export function useGradeStats({
         name: rosterStudent.name,
         email: rosterStudent.email || '',
         avatar: rosterStudent.photoUrl,
-        submitted: submission ? (submission.state === 'TURNED_IN' || submission.state === 'RETURNED') : false,
+        submitted: submission ? (submission.state === 'TURNED_IN' || submission.state === 'RETURNED' || submission.state === 'CREATED') : false,
         grade: submission && typeof submission.assignedGrade === 'number' && typeof assignment?.maxPoints === 'number' && assignment.maxPoints > 0
           ? Number(((submission.assignedGrade / assignment.maxPoints) * 100).toFixed(2))
           : undefined,
@@ -113,6 +113,9 @@ export function useGradeStats({
       if (submission) {
         console.log(`Submission state: ${submission.state}`);
         console.log(`Assigned grade: ${submission.assignedGrade}`);
+        console.log(`Assigned grade type: ${typeof submission.assignedGrade}`);
+        console.log(`Assigned grade === null: ${submission.assignedGrade === null}`);
+        console.log(`Assigned grade === undefined: ${submission.assignedGrade === undefined}`);
       }
       console.log(`Max points: ${assignment?.maxPoints}`);
       

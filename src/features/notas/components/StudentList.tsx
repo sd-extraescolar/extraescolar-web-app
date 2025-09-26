@@ -33,7 +33,13 @@ export function StudentList({ students, assignmentTitle, getGradeColor, handleSe
     <div className="grid gap-4 custom:grid-cols-2 custom:grid-cols-1">
       {students.map((student) => {
         // Debug: verificar el estado del estudiante
-        console.log(`Estudiante ${student.name}: submitted=${student.submitted}, grade=${student.grade}, grade type=${typeof student.grade}`);
+        console.log(`\n=== ESTUDIANTE: ${student.name} ===`);
+        console.log(`submitted: ${student.submitted}`);
+        console.log(`grade: ${student.grade}`);
+        console.log(`grade type: ${typeof student.grade}`);
+        console.log(`grade === undefined: ${student.grade === undefined}`);
+        console.log(`grade === null: ${student.grade === null}`);
+        console.log(`typeof student.grade === 'number': ${typeof student.grade === 'number'}`);
         
         // PRIORIDAD UI: 1-Calificados, 2-Entregados sin calificar, 3-Pendientes
         let statusColor = pastelCorregida;

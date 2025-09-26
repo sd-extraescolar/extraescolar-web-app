@@ -4,9 +4,10 @@ interface ChartsSectionProps {
   donutData: any[];
   barTareaData: any[];
   barCelulaData: any[];
+  globalBarCelulaData?: any[];
 }
 
-export function ChartsSection({ donutData, barTareaData, barCelulaData }: ChartsSectionProps) {
+export function ChartsSection({ donutData, barTareaData, barCelulaData, globalBarCelulaData }: ChartsSectionProps) {
 
   // Colores pastel oscuros unificados (deben coincidir con useGradeManagementData)
   const pastelCorregida = "#34D399"; // education-green-400
@@ -70,7 +71,7 @@ export function ChartsSection({ donutData, barTareaData, barCelulaData }: Charts
   <div className="mb-8 bg-blue-50 rounded-xl p-6">
         <h3 className="text-xl font-bold mb-2">Entregas por célula</h3>
         <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={barCelulaData} layout="vertical" margin={{ left: 30, right: 10, top: 10, bottom: 10 }}>
+          <BarChart data={globalBarCelulaData || barCelulaData} layout="vertical" margin={{ left: 30, right: 10, top: 10, bottom: 10 }}>
             <XAxis type="number" hide domain={[0, 'dataMax']} />
             <YAxis 
               dataKey="name" 

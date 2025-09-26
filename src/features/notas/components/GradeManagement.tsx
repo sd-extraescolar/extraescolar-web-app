@@ -13,6 +13,7 @@ import { StatsCards } from "./StatsCards";
 import { StudentList } from "./StudentList.tsx";
 import { useGradeManagementData } from "./useGradeManagementData";
 // import { useGoogleSubmissions } from '@/hooks/useGoogleSubmissions';
+import { useAllCoursesData } from '@/hooks/useAllCoursesData';
 import { useGoogleRoster } from '@/hooks/useGoogleRoster';
 import { useAllGoogleSubmissions } from './useAllGoogleSubmissions';
 import { useGradeStats } from './useGradeStats';
@@ -96,6 +97,9 @@ export function GradeManagement() {
 		rosterStudents,
 	});
 
+	// Obtener datos globales de todos los cursos
+	const { barCelulaData: globalBarCelulaData } = useAllCoursesData();
+
 	const assignment = assignments.find((a: any) => a.id === selectedAssignment);
 
 	// Mostrar spinner de carga cuando está cargando
@@ -132,7 +136,7 @@ export function GradeManagement() {
 				   porcentajeAprobados={porcentajeAprobados}
 			   />
 			{/* Gráficos de seguimiento */}
-			   <ChartsSection donutData={realDonutData} barTareaData={realBarTareaData} barCelulaData={realBarCelulaData} />
+			   <ChartsSection donutData={realDonutData} barTareaData={realBarTareaData} barCelulaData={realBarCelulaData} globalBarCelulaData={globalBarCelulaData} />
 			{/* Card de tareas y detalles */}
 			<div className="mb-8 bg-blue-50 rounded-xl p-6">
 				<h3 className="text-xl font-bold text-black mb-4">Tareas</h3>
