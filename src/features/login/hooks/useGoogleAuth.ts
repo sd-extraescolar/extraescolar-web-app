@@ -9,7 +9,7 @@ const DISCOVERY_DOCS = [
   "https://classroom.googleapis.com/$discovery/rest?version=v1",
 ];
 const SCOPES = 
-  "https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.coursework.me.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
+  "https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.coursework.me.readonly https://www.googleapis.com/auth/classroom.coursework.students.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
 
 // Declaración de tipos para Google Identity Services y API
 declare global {
