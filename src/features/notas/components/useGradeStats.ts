@@ -55,11 +55,17 @@ export function useGradeStats({
   const totalEstudiantes = rosterStudents.length;
   const totalPendientes = (totalEstudiantes * totalTareas) - totalEntregas;
   
-  // Calcular promedio de todas las calificaciones reales
+  // Calcular promedio de todas las calificaciones reales (convertir a escala 0-100)
   const todasLasCalificaciones = Object.values(allSubmissions || {}).flatMap(submissions => 
     submissions
       .filter(s => s.assignedGrade !== undefined && s.assignedGrade !== null)
-      .map(s => s.assignedGrade)
+      .map(s => {
+        const assignment = assignments.find(a => allSubmissions[a.id]?.includes(s));
+        if (assignment?.maxPoints && assignment.maxPoints > 0) {
+          return Math.round((s.assignedGrade! / assignment.maxPoints) * 100);
+        }
+        return 0;
+      })
   );
   
   const promedio = todasLasCalificaciones.length > 0 
@@ -82,29 +88,32 @@ export function useGradeStats({
     console.log('Assignment submissions:', assignmentSubmissions);
     console.log('Roster students:', rosterStudents);
     
-    const students: Student[] = assignmentSubmissions.map(s => {
-      // Buscar el estudiante en el roster para obtener su nombre real
-      const rosterStudent = rosterStudents.find(rs => rs.id === s.userId);
+    // Crear lista de todos los estudiantes del roster, incluyendo los que no entregaron
+    const students: Student[] = rosterStudents.map(rosterStudent => {
+      // Buscar si este estudiante tiene una submission para esta tarea
+      const submission = assignmentSubmissions.find(s => s.userId === rosterStudent.id);
       
       const studentData = {
-        id: s.userId,
-        name: rosterStudent?.name || s.userId, // Usar nombre real o fallback al userId
-        email: rosterStudent?.email || '',
-        avatar: rosterStudent?.photoUrl,
-        submitted: s.state === 'TURNED_IN' || s.state === 'RETURNED',
-        grade: typeof s.assignedGrade === 'number' && typeof assignment?.maxPoints === 'number' && assignment.maxPoints > 0
-          ? Number(((s.assignedGrade / assignment.maxPoints) * 100).toFixed(2))
+        id: rosterStudent.id,
+        name: rosterStudent.name,
+        email: rosterStudent.email || '',
+        avatar: rosterStudent.photoUrl,
+        submitted: submission ? (submission.state === 'TURNED_IN' || submission.state === 'RETURNED') : false,
+        grade: submission && typeof submission.assignedGrade === 'number' && typeof assignment?.maxPoints === 'number' && assignment.maxPoints > 0
+          ? Number(((submission.assignedGrade / assignment.maxPoints) * 100).toFixed(2))
           : undefined,
-        submissionDate: s.updateTime,
+        submissionDate: submission?.updateTime,
       };
       
       console.log(`\n--- ESTUDIANTE: ${studentData.name} ---`);
-      console.log('Submission data:', s);
       console.log('Roster student:', rosterStudent);
+      console.log('Submission found:', submission);
       console.log('Student data:', studentData);
       console.log(`Estado: submitted=${studentData.submitted}, grade=${studentData.grade}, grade type=${typeof studentData.grade}`);
-      console.log(`Submission state: ${s.state}`);
-      console.log(`Assigned grade: ${s.assignedGrade}`);
+      if (submission) {
+        console.log(`Submission state: ${submission.state}`);
+        console.log(`Assigned grade: ${submission.assignedGrade}`);
+      }
       console.log(`Max points: ${assignment?.maxPoints}`);
       
       return studentData;
