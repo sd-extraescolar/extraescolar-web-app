@@ -1,6 +1,6 @@
 import { AttendanceCalendar } from "../components/AttendanceCalendar";
 import { StudentAttendanceList } from "../components/StudentAttendanceList";
-import { useAttendance } from "../hooks/useAttendance";
+import { useHybridAttendance } from "@/hooks/useHybridAttendance";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 
@@ -8,18 +8,18 @@ export const PresencialidadPage = () => {
   const authContext = useContext(AuthContext);
   const {
     selectedDate,
-    currentStudents,
-    currentStats,
+    getCurrentStudents,
+    getCurrentStats,
     hasCurrentRecord,
     selectDate,
     toggleStudentStatus,
-    createAttendanceRecord,
-    saveAttendance,
+    createRecord,
+    saveRecord,
     selectAll,
     unselectAll,
     calendarAttendanceData,
-    pendingChanges
-  } = useAttendance();
+    pendingChanges,
+  } = useHybridAttendance();
 
   useEffect(() => {
     if (authContext?.selectedCourse && authContext?.fetchStudents) {
@@ -28,7 +28,7 @@ export const PresencialidadPage = () => {
       // Obtener estudiantes del curso seleccionado
       authContext.fetchStudents(authContext.selectedCourse.id);
     }
-  }, [authContext?.selectedCourse?.id]);
+  }, [authContext?.selectedCourse?.id, authContext?.fetchStudents, authContext]);
 
   useEffect(() => {
     if (authContext?.students && authContext.students.length > 0) {
@@ -62,12 +62,12 @@ export const PresencialidadPage = () => {
         <div className="min-h-0 overflow-hidden">
           <StudentAttendanceList
             selectedDate={selectedDate}
-            students={currentStudents}
+            students={getCurrentStudents()}
             onStudentStatusChange={toggleStudentStatus}
-            onCreateRecord={createAttendanceRecord}
-            onSaveAttendance={saveAttendance}
+            onCreateRecord={createRecord}
+            onSaveAttendance={saveRecord}
             hasAttendanceRecord={hasCurrentRecord}
-            attendanceStats={currentStats}
+            attendanceStats={getCurrentStats()}
             onSelectAll={selectAll}
             onUnselectAll={unselectAll}
           />

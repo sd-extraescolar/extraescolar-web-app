@@ -479,5 +479,6 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
     isGapiReady,
     students,
     fetchStudents,
+    accessToken,
   };
 }

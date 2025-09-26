@@ -16,4 +16,5 @@ export interface UseGoogleAuthReturn {
   isGapiReady: boolean;
   students: Student[];
   fetchStudents: (courseId: string) => Promise<void>;
+  accessToken: string | null;
 }

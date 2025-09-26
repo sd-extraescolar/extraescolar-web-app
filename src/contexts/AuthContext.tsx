@@ -33,6 +33,7 @@ interface AuthContextType {
   isGapiReady: boolean;
   students: Student[];
   fetchStudents: (courseId: string) => Promise<void>;
+  accessToken: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isGapiReady,
     students,
     fetchStudents,
+    accessToken,
   } = useGoogleAuth();
 
   // Estado para el curso seleccionado
@@ -91,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isGapiReady,
     students,
     fetchStudents,
+    accessToken,
   };
 
   return (
