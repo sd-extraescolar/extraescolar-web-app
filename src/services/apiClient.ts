@@ -53,6 +53,17 @@ export class ApiClient {
         throw new Error(errorData.message || `HTTP ${response.status}`);
       }
 
+      // Para respuestas 204 (No Content), no intentar parsear JSON
+      if (response.status === 204) {
+        return null as T;
+      }
+
+      // Verificar si hay contenido antes de parsear
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        return null as T;
+      }
+
       const data = await response.json();
       return data;
     } catch (error) {

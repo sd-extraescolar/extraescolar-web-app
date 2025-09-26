@@ -8,9 +8,11 @@ import {
   Plus,
   Save,
   Square,
+  Trash2,
   Users
 } from "lucide-react";
 import { useState } from "react";
+import { DeleteEventModal } from "@/features/presencialidad/components/DeleteEventModal";
 
 interface Student {
   id: string;
@@ -26,6 +28,7 @@ interface StudentAttendanceListProps {
   onStudentStatusChange: (studentId: string, status: 'present' | 'absent') => void;
   onCreateRecord: () => void;
   onSaveAttendance: () => void;
+  onDeleteEvent?: () => void;
   hasAttendanceRecord: boolean;
   attendanceStats: {
     present: number;
@@ -43,12 +46,14 @@ export const StudentAttendanceList = ({
   onStudentStatusChange,
   onCreateRecord,
   onSaveAttendance,
+  onDeleteEvent,
   hasAttendanceRecord,
   attendanceStats,
   onSelectAll,
   onUnselectAll
 }: StudentAttendanceListProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('es-ES', {
@@ -65,10 +70,8 @@ export const StudentAttendanceList = ({
 
   // Determinar si todos los estudiantes filtrados están seleccionados
   const allSelected = filteredStudents.length > 0 && filteredStudents.every(student => student.status === 'present');
-  const someSelected = filteredStudents.some(student => student.status === 'present');
   
   // Determinar el modo del botón basado en el estado actual
-  const shouldSelectAll = !allSelected && someSelected;
   const shouldDeselectAll = allSelected;
 
 
@@ -114,6 +117,15 @@ export const StudentAttendanceList = ({
               >
                 <Save className="w-4 h-4" />
                 Guardar
+              </Button>
+              <Button
+                onClick={() => setShowDeleteModal(true)}
+                variant="outline"
+                size="default"
+                className="w-24 h-10 bg-red-500 text-white border-red-500 hover:bg-red-600 hover:border-red-600 hover:text-white flex items-center gap-1 px-4"
+              >
+                <Trash2 className="w-4 h-4" />
+                Borrar
               </Button>
             </div>
           )}
@@ -244,6 +256,15 @@ export const StudentAttendanceList = ({
           </>
         )}
       </CardContent>
+      
+      {/* Delete Event Modal */}
+      {showDeleteModal && onDeleteEvent && (
+        <DeleteEventModal
+          selectedDate={selectedDate}
+          onConfirm={onDeleteEvent}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
     </Card>
   );
 };

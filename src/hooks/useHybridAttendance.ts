@@ -36,6 +36,7 @@ export interface UseHybridAttendanceReturn {
   createRecord: () => Promise<void>;
   toggleStudentStatus: (studentId: string, status: 'present' | 'absent') => void;
   saveRecord: () => Promise<void>;
+  deleteRecord: () => Promise<void>;
   selectAll: () => void;
   unselectAll: () => void;
   
@@ -60,6 +61,8 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [loadedCohorteId, setLoadedCohorteId] = useState<string | null>(null);
+  const [calendarData, setCalendarData] = useState<Record<string, { present: number; total: number; percentage: number }>>({});
+  const [pendingChanges, setPendingChanges] = useState<Record<string, boolean>>({});
 
   // Obtener la fecha en formato string para usar como clave
   const getDateKey = (date: Date): string => {
@@ -130,6 +133,48 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
 
     loadEventos();
   }, [authContext?.selectedCourse?.id, authContext?.accessToken, loadedCohorteId, apiAttendance, convertApiEventoToRecord]);
+
+  // Actualizar datos del calendario cuando cambien los registros
+  useEffect(() => {
+    const data: Record<string, { present: number; total: number; percentage: number }> = {};
+    
+    console.log('Actualizando datos del calendario con', records.length, 'registros');
+    
+    records.forEach(record => {
+      const dateKey = getDateKey(new Date(record.fecha));
+      const present = record.estudiantes.filter(s => s.status === 'present').length;
+      const total = record.estudiantes.length;
+      const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+      
+      data[dateKey] = {
+        present,
+        total,
+        percentage
+      };
+    });
+    
+    console.log('Datos del calendario actualizados:', data);
+    setCalendarData(data);
+  }, [records]);
+
+  // Actualizar cambios pendientes cuando cambien los registros
+  useEffect(() => {
+    const pending: Record<string, boolean> = {};
+    
+    records.forEach(record => {
+      const dateKey = getDateKey(new Date(record.fecha));
+      // Marcar como pendiente si el registro fue modificado recientemente
+      const recordDate = new Date(record.updatedAt);
+      const now = new Date();
+      const timeDiff = now.getTime() - recordDate.getTime();
+      const minutesDiff = timeDiff / (1000 * 60);
+      
+      // Si fue modificado en los últimos 5 minutos, considerarlo pendiente
+      pending[dateKey] = minutesDiff < 5;
+    });
+    
+    setPendingChanges(pending);
+  }, [records]);
 
   // Obtener registro actual para la fecha seleccionada
   const getCurrentRecord = useCallback((): HybridAttendanceRecord | null => {
@@ -302,6 +347,49 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
     }
   }, [getCurrentRecord, apiAttendance, convertApiEventoToRecord]);
 
+  // Eliminar registro
+  const deleteRecord = useCallback(async (): Promise<void> => {
+    const currentRecord = getCurrentRecord();
+    
+    if (!currentRecord || !currentRecord.eventoId) {
+      setError('No hay registro válido para eliminar');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      console.log('Eliminando evento:', currentRecord.eventoId);
+      
+      // Llamar a la API para eliminar el evento
+      const success = await apiAttendance.deleteEvento(currentRecord.eventoId);
+      
+      if (success) {
+        // Remover el registro de la lista local inmediatamente
+        setRecords(prev => {
+          const newRecords = prev.filter(record => record.id !== currentRecord.id);
+          console.log('Registros después de eliminar:', newRecords.length);
+          return newRecords;
+        });
+        
+        // También actualizar la lista de eventos en el hook de API
+        apiAttendance.removeEventoFromList(currentRecord.eventoId);
+        
+        console.log('Evento eliminado exitosamente');
+      } else {
+        setError('No se pudo eliminar el evento');
+      }
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al eliminar registro';
+      setError(errorMessage);
+      console.error('Error deleting record:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getCurrentRecord, apiAttendance]);
+
   // Seleccionar todos los estudiantes
   const selectAll = useCallback(() => {
     const currentRecord = getCurrentRecord();
@@ -349,41 +437,6 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
     setError(null);
   }, []);
 
-  // Obtener datos de asistencia para el calendario
-  const getCalendarAttendanceData = useCallback(() => {
-    const data: Record<string, { present: number; total: number; percentage: number }> = {};
-    
-    records.forEach(record => {
-      const dateKey = getDateKey(new Date(record.fecha));
-      const stats = getCurrentStats();
-      data[dateKey] = {
-        present: stats.present,
-        total: stats.total,
-        percentage: stats.percentage
-      };
-    });
-    
-    return data;
-  }, [records, getCurrentStats]);
-
-  // Obtener cambios pendientes para el calendario
-  const getPendingChanges = useCallback(() => {
-    const pending: Record<string, boolean> = {};
-    
-    records.forEach(record => {
-      const dateKey = getDateKey(new Date(record.fecha));
-      // Marcar como pendiente si el registro fue modificado recientemente
-      const recordDate = new Date(record.updatedAt);
-      const now = new Date();
-      const timeDiff = now.getTime() - recordDate.getTime();
-      const minutesDiff = timeDiff / (1000 * 60);
-      
-      // Si fue modificado en los últimos 5 minutos, considerarlo pendiente
-      pending[dateKey] = minutesDiff < 5;
-    });
-    
-    return pending;
-  }, [records]);
 
   return {
     // Estado
@@ -397,6 +450,7 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
     createRecord,
     toggleStudentStatus,
     saveRecord,
+    deleteRecord,
     selectAll,
     unselectAll,
     
@@ -408,7 +462,7 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
     clearError,
     
     // Datos para calendario
-    calendarAttendanceData: getCalendarAttendanceData(),
-    pendingChanges: getPendingChanges(),
+    calendarAttendanceData: calendarData,
+    pendingChanges: pendingChanges,
   };
 };

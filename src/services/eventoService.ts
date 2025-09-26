@@ -47,6 +47,15 @@ export class EventoService {
   async updateEvento(eventoId: string, eventoData: Partial<CreateEventoRequest>): Promise<Evento> {
     return apiClient.put<Evento>(`/eventos/${eventoId}`, eventoData);
   }
+
+  /**
+   * Eliminar un evento
+   */
+  async deleteEvento(eventoId: string): Promise<void> {
+    await apiClient.delete<void>(`/eventos/${eventoId}`);
+    // La API devuelve 204 (No Content), así que no hay datos que retornar
+    return;
+  }
 }
 
 // Instancia singleton del servicio

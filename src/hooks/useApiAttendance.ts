@@ -29,10 +29,12 @@ export interface UseApiAttendanceReturn {
   markAttendance: (eventoId: string, alumnoIds: string[]) => Promise<Evento | null>;
   removeAttendance: (eventoId: string, alumnoIds: string[]) => Promise<Evento | null>;
   getEventoById: (eventoId: string) => Promise<Evento | null>;
+  deleteEvento: (eventoId: string) => Promise<boolean>;
   
   // Utilidades
   clearError: () => void;
   refreshEventos: () => Promise<void>;
+  removeEventoFromList: (eventoId: string) => void;
 }
 
 export const useApiAttendance = (): UseApiAttendanceReturn => {
@@ -185,12 +187,36 @@ export const useApiAttendance = (): UseApiAttendanceReturn => {
     }
   }, [setupApiClient]);
 
+  // Eliminar evento
+  const deleteEvento = useCallback(async (eventoId: string): Promise<boolean> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setupApiClient();
+
+      await eventoService.deleteEvento(eventoId);
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al eliminar evento';
+      setError(errorMessage);
+      console.error('Error deleting evento:', err);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setupApiClient]);
+
   // Refrescar eventos
   const refreshEventos = useCallback(async (): Promise<void> => {
     if (authContext?.selectedCourse) {
       await getEventosByCohorte(authContext.selectedCourse.id);
     }
   }, [authContext?.selectedCourse, getEventosByCohorte]);
+
+  // Remover evento de la lista local
+  const removeEventoFromList = useCallback((eventoId: string) => {
+    setEventos(prev => prev.filter(evento => evento.id !== eventoId));
+  }, []);
 
   return {
     // Estado
@@ -204,9 +230,11 @@ export const useApiAttendance = (): UseApiAttendanceReturn => {
     markAttendance,
     removeAttendance,
     getEventoById,
+    deleteEvento,
     
     // Utilidades
     clearError,
     refreshEventos,
+    removeEventoFromList,
   };
 };

@@ -15,6 +15,7 @@ export const PresencialidadPage = () => {
     toggleStudentStatus,
     createRecord,
     saveRecord,
+    deleteRecord,
     selectAll,
     unselectAll,
     calendarAttendanceData,
@@ -66,6 +67,7 @@ export const PresencialidadPage = () => {
             onStudentStatusChange={toggleStudentStatus}
             onCreateRecord={createRecord}
             onSaveAttendance={saveRecord}
+            onDeleteEvent={deleteRecord}
             hasAttendanceRecord={hasCurrentRecord}
             attendanceStats={getCurrentStats()}
             onSelectAll={selectAll}
