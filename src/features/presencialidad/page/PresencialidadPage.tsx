@@ -1,8 +1,11 @@
 import { AttendanceCalendar } from "../components/AttendanceCalendar";
 import { StudentAttendanceList } from "../components/StudentAttendanceList";
 import { useAttendance } from "../hooks/useAttendance";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 
 export const PresencialidadPage = () => {
+  const authContext = useContext(AuthContext);
   const {
     selectedDate,
     currentStudents,
@@ -17,6 +20,21 @@ export const PresencialidadPage = () => {
     calendarAttendanceData,
     pendingChanges
   } = useAttendance();
+
+  useEffect(() => {
+    if (authContext?.selectedCourse && authContext?.fetchStudents) {
+      console.log("Curso seleccionado en PresencialidadPage:", authContext.selectedCourse);
+      
+      // Obtener estudiantes del curso seleccionado
+      authContext.fetchStudents(authContext.selectedCourse.id);
+    }
+  }, [authContext?.selectedCourse?.id]);
+
+  useEffect(() => {
+    if (authContext?.students && authContext.students.length > 0) {
+      console.log("Estudiantes del curso seleccionado:", authContext.students);
+    }
+  }, [authContext?.students]);
 
   return (
     <div className="h-full flex flex-col overflow-hidden">

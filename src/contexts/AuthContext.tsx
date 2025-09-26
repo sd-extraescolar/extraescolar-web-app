@@ -1,6 +1,7 @@
 import { useGoogleAuth } from "@/features/login/hooks/useGoogleAuth";
 import type { ReactNode } from 'react';
 import { createContext, useEffect, useState } from 'react';
+import type { Student } from '@/data';
 
 interface Course {
   id: string;
@@ -30,6 +31,8 @@ interface AuthContextType {
   selectCourse: (course: Course) => void;
   clearSelectedCourse: () => void;
   isGapiReady: boolean;
+  students: Student[];
+  fetchStudents: (courseId: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,6 +49,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     handleLogin,
     handleLogout,
     isGapiReady,
+    students,
+    fetchStudents,
   } = useGoogleAuth();
 
   // Estado para el curso seleccionado
@@ -84,6 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     selectCourse,
     clearSelectedCourse,
     isGapiReady,
+    students,
+    fetchStudents,
   };
 
   return (
