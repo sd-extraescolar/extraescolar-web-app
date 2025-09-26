@@ -20,17 +20,23 @@ interface StudentListProps {
 }
 
 export function StudentList({ students, assignmentTitle, getGradeColor, handleSendNotification }: StudentListProps) {
+  // Colores pastel oscuros para los estados, igual que los gráficos
+  const pastelCorregida = "bg-[#34D399]"; // verde
+  const pastelComenzada = "bg-[#FBBF24]"; // amarillo
+  const pastelEntregada = "bg-[#60A5FA]"; // azul
+  const pastelReclamada = "bg-[#F87171]"; // rojo
+
   return (
     <div className="grid gap-4 custom:grid-cols-2 custom:grid-cols-1">
       {students.map((student) => {
         // Estado: corregida (verde), entregada (azul), comenzada (amarillo), no entregada (rojo)
-        let statusColor = "bg-education-green-500"; // corregida
+        let statusColor = pastelCorregida;
         if (!student.submitted) {
-          statusColor = "bg-alert-red-500";
+          statusColor = pastelReclamada;
         } else if (student.grade === undefined) {
-          statusColor = "bg-progress-yellow-500";
+          statusColor = pastelComenzada;
         } else if (student.grade !== undefined && student.grade < 7) {
-          statusColor = "bg-digital-blue-500";
+          statusColor = pastelEntregada;
         }
         return (
           <div

@@ -7,6 +7,13 @@ interface ChartsSectionProps {
 }
 
 export function ChartsSection({ donutData, barTareaData, barCelulaData }: ChartsSectionProps) {
+
+  // Colores pastel oscuros unificados (deben coincidir con useGradeManagementData)
+  const pastelCorregida = "#34D399"; // education-green-400
+  const pastelComenzada = "#FBBF24"; // progress-yellow-400
+  const pastelEntregada = "#60A5FA"; // digital-blue-400
+  const pastelReclamada = "#F87171"; // alert-red-400
+
   return (
     <>
       <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -42,10 +49,10 @@ export function ChartsSection({ donutData, barTareaData, barCelulaData }: Charts
               <YAxis dataKey="name" type="category" width={80} />
               <Tooltip />
               <Legend verticalAlign="top" />
-              <Bar dataKey="corregida" stackId="a" fill="#2ECC71" name="corregida" />
-              <Bar dataKey="comenzada" stackId="a" fill="#F1C40F" name="comenzada" />
-              <Bar dataKey="entregada" stackId="a" fill="#3498DB" name="entregada" />
-              <Bar dataKey="reclamada" stackId="a" fill="#E74C3C" name="reclamada" />
+              <Bar dataKey="corregida" stackId="a" fill={pastelCorregida} name="corregida" />
+              <Bar dataKey="comenzada" stackId="a" fill={pastelComenzada} name="comenzada" />
+              <Bar dataKey="entregada" stackId="a" fill={pastelEntregada} name="entregada" />
+              <Bar dataKey="reclamada" stackId="a" fill={pastelReclamada} name="reclamada" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -58,10 +65,10 @@ export function ChartsSection({ donutData, barTareaData, barCelulaData }: Charts
             <YAxis dataKey="name" type="category" width={80} />
             <Tooltip />
             <Legend verticalAlign="top" />
-            <Bar dataKey="corregida" stackId="a" fill="#2ECC71" name="corregida" />
-            <Bar dataKey="comenzada" stackId="a" fill="#F1C40F" name="comenzada" />
-            <Bar dataKey="entregada" stackId="a" fill="#3498DB" name="entregada" />
-            <Bar dataKey="reclamada" stackId="a" fill="#E74C3C" name="reclamada" />
+            <Bar dataKey="corregida" stackId="a" fill={pastelCorregida} name="corregida" />
+            <Bar dataKey="comenzada" stackId="a" fill={pastelComenzada} name="comenzada" />
+            <Bar dataKey="entregada" stackId="a" fill={pastelEntregada} name="entregada" />
+            <Bar dataKey="reclamada" stackId="a" fill={pastelReclamada} name="reclamada" />
           </BarChart>
         </ResponsiveContainer>
       </div>

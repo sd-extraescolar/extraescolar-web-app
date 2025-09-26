@@ -114,11 +114,17 @@ export function useGradeManagementData() {
     },
   ];
 
+  // Paleta pastel más oscura y unificada para todos los gráficos
+  const pastelCorregida = "#34D399"; // education-green-400
+  const pastelComenzada = "#FBBF24"; // progress-yellow-400
+  const pastelEntregada = "#60A5FA"; // digital-blue-400
+  const pastelReclamada = "#F87171"; // alert-red-400
+
   const donutData = [
-    { name: "reclamada", value: 3, color: "#E74C3C" },
-    { name: "entregada", value: 2, color: "#3498DB" },
-    { name: "corregida", value: 16, color: "#2ECC71" },
-    { name: "comenzada", value: 4, color: "#F1C40F" },
+    { name: "reclamada", value: 3, color: pastelReclamada },
+    { name: "entregada", value: 2, color: pastelEntregada },
+    { name: "corregida", value: 16, color: pastelCorregida },
+    { name: "comenzada", value: 4, color: pastelComenzada },
   ];
   const barTareaData = [
     { name: "tarea_9", corregida: 10, comenzada: 2, entregada: 3, reclamada: 1 },
@@ -134,6 +140,7 @@ export function useGradeManagementData() {
     { name: "MKT_6", corregida: 7, comenzada: 5, entregada: 6, reclamada: 2 },
     { name: "MKT_5", corregida: 6, comenzada: 6, entregada: 7, reclamada: 1 },
   ];
+
 
   const [selectedAssignment, setSelectedAssignment] = useState<string>(mockAssignments[0]?.id || "");
   const [searchTerm, setSearchTerm] = useState("");
