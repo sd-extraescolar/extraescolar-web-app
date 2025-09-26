@@ -2,13 +2,13 @@
  * Hook híbrido que combina el sistema local de asistencia con la API
  */
 
-import { useState, useCallback, useContext, useEffect } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
-import { useApiAttendance } from './useApiAttendance';
-import { cohorteService } from '@/services/cohorteService';
-import { apiClient } from '@/services/apiClient';
-import { useToast } from '@/components/ui/use-toast';
 import type { Evento } from '@/data';
+import { useToast } from '@/hooks/use-toast';
+import { apiClient } from '@/services/apiClient';
+import { cohorteService } from '@/services/cohorteService';
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { useApiAttendance } from './useApiAttendance';
 
 export interface HybridAttendanceRecord {
   id: string;

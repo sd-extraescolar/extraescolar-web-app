@@ -2,12 +2,12 @@
  * Hook para manejar asistencia con la API de Extraescolar Core
  */
 
-import { useState, useCallback, useContext } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
-import { eventoService } from '@/services/eventoService';
+import type { AttendanceUpdateRequest, CreateEventoRequest, Evento } from '@/data';
+import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/services/apiClient';
-import { useToast } from '@/components/ui/use-toast';
-import type { Evento, CreateEventoRequest, AttendanceUpdateRequest } from '@/data';
+import { eventoService } from '@/services/eventoService';
+import { useCallback, useContext, useState } from 'react';
 
 export interface ApiAttendanceRecord {
   id: string;
