@@ -1,7 +1,7 @@
+import type { Student } from '@/data';
 import { useGoogleAuth } from "@/features/login/hooks/useGoogleAuth";
 import type { ReactNode } from 'react';
 import { createContext, useEffect, useState } from 'react';
-import type { Student } from '@/data';
 
 interface Course {
   id: string;
@@ -34,6 +34,7 @@ interface AuthContextType {
   students: Student[];
   fetchStudents: (courseId: string) => Promise<void>;
   accessToken: string | null;
+  hasNoCourses: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -62,8 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (courses.length > 0 && !selectedCourse) {
       setSelectedCourse(courses[0]);
+    } else if (courses.length === 0) {
+      // Limpiar selección si no hay cursos
+      setSelectedCourse(null);
     }
   }, [courses, selectedCourse]);
+
+  // Detectar si no hay cursos asignados
+  const hasNoCourses = !isLoading && courses.length === 0;
 
   // Método para seleccionar un curso
   const selectCourse = (course: Course) => {
@@ -94,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     students,
     fetchStudents,
     accessToken,
+    hasNoCourses,
   };
 
   return (

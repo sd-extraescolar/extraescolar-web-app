@@ -234,6 +234,9 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
       });
       
       const coursesList = response.result.courses || [];
+      
+      // La API de Google Classroom solo devuelve cursos donde el usuario es profesor
+      // No necesitamos filtrar adicionalmente ya que la API maneja esto automáticamente
       setCourses(coursesList);
       
       // Persistir cursos si hay token de acceso
