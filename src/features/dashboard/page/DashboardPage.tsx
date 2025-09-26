@@ -1,15 +1,20 @@
+import { CourseSelector } from "@/components/CourseSelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCourses } from "@/hooks/useCourses";
 import {
-    AlertCircle,
-    BookOpen,
-    Calendar,
-    CheckCircle,
-    Clock,
-    TrendingUp,
-    Users
+  AlertCircle,
+  BookOpen,
+  Calendar,
+  CheckCircle,
+  Clock,
+  TrendingUp,
+  Users
 } from "lucide-react";
 
 export const DashboardPage = () => {
+  // Hook para gestionar cursos
+  const { selectedCourse, hasSelectedCourse, getSelectedCourseInfo } = useCourses();
+  
   // Mock data - en el futuro esto vendrá de la API
   const stats = [
     {
@@ -181,6 +186,11 @@ export const DashboardPage = () => {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Selector de Cursos */}
+      <div className="col-span-1 lg:col-span-2">
+        <CourseSelector />
       </div>
     </div>
   );
