@@ -30,7 +30,7 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
   const navigationItems = [
     {
       id: "dashboard",
-      path: "/dashboard",
+      path: "/",
       label: "Dashboard",
       icon: LayoutDashboard,
       color: "text-digital-blue",
@@ -55,7 +55,7 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
   ];
 
   const isActive = (path: string) => {
-    return location.pathname.startsWith(path);
+    return location.pathname === path;
   };
 
   return (
