@@ -33,17 +33,11 @@ export const Layout = ({ children }: LayoutProps) => {
     }
   };
 
-  const handleCohortChange = (cohortId: string) => {
-    console.log(`Cambiando a cohorte: ${cohortId}`);
-    // Aquí implementarías la lógica para cambiar de cohorte
-  };
-  
   return (
     <>
       {/* Header */}
       <Header 
         onMenuClick={handleMenuClick}
-        onCohortChange={handleCohortChange}
       />
       
       {/* Backdrop for mobile */}
