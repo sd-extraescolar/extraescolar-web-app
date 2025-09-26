@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
 
 interface Student {
@@ -22,22 +22,35 @@ interface StudentListProps {
 export function StudentList({ students, assignmentTitle, getGradeColor, handleSendNotification }: StudentListProps) {
   // Colores pastel oscuros para los estados, igual que los gráficos
   const pastelCorregida = "bg-[#34D399]"; // verde
-  const pastelComenzada = "bg-[#FBBF24]"; // amarillo
   const pastelEntregada = "bg-[#60A5FA]"; // azul
-  const pastelReclamada = "bg-[#F87171]"; // rojo
+  const pastelNoEntregada = "bg-yellow-500"; // AMARILLO para no entregada (MÁXIMA PRIORIDAD)
+  const pastelSinCalificar = "bg-gray-500"; // gris oscuro para sin calificar
+
+
+  console.log("students", students)
 
   return (
     <div className="grid gap-4 custom:grid-cols-2 custom:grid-cols-1">
       {students.map((student) => {
-        // Estado: corregida (verde), entregada (azul), comenzada (amarillo), no entregada (rojo)
+        // Debug: verificar el estado del estudiante
+        console.log(`Estudiante ${student.name}: submitted=${student.submitted}, grade=${student.grade}`);
+        
+        // PRIORIDAD MÁXIMA: Pendiente (no entregado) > Sin calificar > Entregada > Corregida
         let statusColor = pastelCorregida;
+        
+        // PRIORIDAD 1: NO ENTREGADO (PENDIENTE) - MÁXIMA PRIORIDAD
         if (!student.submitted) {
-          statusColor = pastelReclamada;
-        } else if (student.grade === undefined) {
-          statusColor = pastelComenzada;
-        } else if (student.grade !== undefined && student.grade < 7) {
-          statusColor = pastelEntregada;
+          statusColor = pastelNoEntregada; // AMARILLO - MÁXIMA PRIORIDAD
+        } 
+        // PRIORIDAD 2: ENTREGADO PERO SIN CALIFICAR
+        else if (student.grade === undefined || student.grade === null) {
+          statusColor = pastelSinCalificar; // Gris oscuro - SEGUNDA PRIORIDAD
+        } 
+        // PRIORIDAD 3: ENTREGADO PERO NO APROBADO
+        else if (student.grade !== undefined && student.grade < 70) {
+          statusColor = pastelEntregada; // Azul - TERCERA PRIORIDAD
         }
+        // PRIORIDAD 4: CORREGIDO Y APROBADO (default)
         return (
           <div
             key={student.id}
@@ -57,30 +70,34 @@ export function StudentList({ students, assignmentTitle, getGradeColor, handleSe
               <div>
                 <div className="font-medium text-dark-text">{student.name}</div>
                 <div className="text-sm text-medium-gray">{student.email}</div>
-                {student.submissionDate && (
-                  <div className="text-xs text-medium-gray">
-                    Entregado: {student.submissionDate}
-                  </div>
-                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {student.submitted ? (
-                <div className="text-right">
-                  <div className={`text-lg font-bold ${getGradeColor(student.grade!)}`}>
-                    {student.grade}/10
-                  </div>
-                </div>
-              ) : (
+              {!student.submitted ? (
+                // PRIORIDAD 1: NO ENTREGADO (PENDIENTE) - MÁXIMA PRIORIDAD
                 <Button
                   size="icon"
                   variant="outline"
                   onClick={() => handleSendNotification(student.email, assignmentTitle)}
                   className="bg-progress-yellow-500 hover:bg-progress-yellow-600 text-white border-none"
-                  title="Notificar"
+                  title="Notificar - Pendiente de entrega"
                 >
                   <Mail className="w-4 h-4" />
                 </Button>
+              ) : (student.grade === undefined || student.grade === null) ? (
+                // PRIORIDAD 2: ENTREGADO PERO SIN CALIFICAR - SEGUNDA PRIORIDAD
+                <div className="text-right">
+                  <div className="text-lg font-bold text-gray-400">
+                    Sin calificar
+                  </div>
+                </div>
+              ) : (
+                // PRIORIDAD 3: Mostrar calificación para entregas calificadas
+                <div className="text-right">
+                  <div className={`text-lg font-bold ${getGradeColor(student.grade)}`}>
+                    {student.grade}/100
+                  </div>
+                </div>
               )}
             </div>
           </div>

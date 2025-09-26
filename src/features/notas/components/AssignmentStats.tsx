@@ -8,21 +8,21 @@ interface AssignmentStatsProps {
 export function AssignmentStats({ submittedCount, totalStudents, averageGrade, passRate }: AssignmentStatsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div className="bg-education-green-50 p-4 rounded-lg">
-        <div className="text-2xl font-bold text-education-green-700">{submittedCount}</div>
-        <div className="text-sm text-education-green-700">Entregas</div>
+      <div className="bg-green-500 rounded-xl p-6">
+        <div className="text-2xl font-bold text-white">{submittedCount}</div>
+        <div className="text-sm font-medium text-white">Entregas</div>
       </div>
-      <div className="bg-progress-yellow-50 p-4 rounded-lg">
-        <div className="text-2xl font-bold text-progress-yellow-700">{totalStudents - submittedCount}</div>
-        <div className="text-sm text-progress-yellow-700">Pendientes</div>
+      <div className="bg-yellow-400 rounded-xl p-6">
+        <div className="text-2xl font-bold text-white">{totalStudents - submittedCount}</div>
+        <div className="text-sm font-medium text-white">Pendientes</div>
       </div>
-      <div className="bg-digital-blue-50 p-4 rounded-lg">
-        <div className="text-2xl font-bold text-digital-blue-700">{averageGrade}</div>
-        <div className="text-sm text-digital-blue-700">Promedio</div>
+      <div className="bg-blue-500 rounded-xl p-6">
+        <div className="text-2xl font-bold text-white">{averageGrade}</div>
+        <div className="text-sm font-medium text-white">Promedio</div>
       </div>
-      <div className="bg-education-green-50 p-4 rounded-lg">
-        <div className="text-2xl font-bold text-education-green-700">{passRate}%</div>
-        <div className="text-sm text-education-green-700">Aprobación</div>
+      <div className="bg-purple-500 rounded-xl p-6">
+        <div className="text-2xl font-bold text-white">{passRate}%</div>
+        <div className="text-sm font-medium text-white">Aprobación</div>
       </div>
     </div>
   );

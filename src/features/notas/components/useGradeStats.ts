@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+// import { useMemo } from 'react';
 
 interface Assignment {
   id: string;
@@ -34,42 +34,72 @@ export function useGradeStats({
   assignments = [],
   allSubmissions = {},
   selectedAssignmentId,
+  rosterStudents = [],
 }: {
   courses: any[];
   assignments: Assignment[];
   allSubmissions: AllSubmissions;
   selectedAssignmentId?: string;
+  rosterStudents?: Array<{ id: string; name: string; email: string; photoUrl?: string }>;
 }) {
-  // Global stats
+  // Global stats - calculadas a partir de datos reales
   const totalCursos = courses.length;
   const totalTareas = assignments.length;
-  const totalEntregas = assignments.reduce((acc, a) => acc + (a.submissionCount || 0), 0);
-  const totalPendientes = assignments.reduce((acc, a) => acc + ((a.assignedCount || 0) - (a.submissionCount || 0)), 0);
-  const allGrades = assignments.flatMap(a => a.maxPoints ? [a.maxPoints] : []);
-  const promedio = allGrades.length ? Number((allGrades.reduce((a, b) => a + b, 0) / allGrades.length).toFixed(2)) : 0;
+  
+  // Calcular entregas totales basadas en submissions reales
+  const totalEntregas = Object.values(allSubmissions || {}).reduce((acc, submissions) => {
+    return acc + submissions.filter(s => s.state === 'TURNED_IN' || s.state === 'RETURNED').length;
+  }, 0);
+  
+  // Calcular pendientes basados en estudiantes del roster vs entregas
+  const totalEstudiantes = rosterStudents.length;
+  const totalPendientes = (totalEstudiantes * totalTareas) - totalEntregas;
+  
+  // Calcular promedio de todas las calificaciones reales
+  const todasLasCalificaciones = Object.values(allSubmissions || {}).flatMap(submissions => 
+    submissions
+      .filter(s => s.assignedGrade !== undefined && s.assignedGrade !== null)
+      .map(s => s.assignedGrade)
+  );
+  
+  const promedio = todasLasCalificaciones.length > 0 
+    ? Number((todasLasCalificaciones.reduce((a, b) => (a || 0) + (b || 0), 0) / todasLasCalificaciones.length).toFixed(2))
+    : 0;
+  
+  // Calcular % de aprobados basado en calificaciones reales
+  const calificacionesAprobadas = todasLasCalificaciones ? todasLasCalificaciones.filter(grade => (grade || 0) >= 70).length : 0;
+  const porcentajeAprobados = todasLasCalificaciones && todasLasCalificaciones.length > 0 
+    ? Math.round((calificacionesAprobadas / todasLasCalificaciones.length) * 100)
+    : 0;
 
 
   // Per-assignment stats for all assignments
   const perAssignmentStats = assignments.map(assignment => {
     const assignmentSubmissions = allSubmissions[assignment.id] || [];
-    const students: Student[] = assignmentSubmissions.map(s => ({
-      id: s.userId,
-      name: s.userId,
-      email: '',
-      submitted: s.state === 'TURNED_IN' || s.state === 'RETURNED',
-      grade: typeof s.assignedGrade === 'number' && typeof assignment?.maxPoints === 'number' && assignment.maxPoints > 0
-        ? Number(((s.assignedGrade / assignment.maxPoints) * 10).toFixed(2))
-        : undefined,
-      submissionDate: s.updateTime,
-    }));
+    const students: Student[] = assignmentSubmissions.map(s => {
+      // Buscar el estudiante en el roster para obtener su nombre real
+      const rosterStudent = rosterStudents.find(rs => rs.id === s.userId);
+      
+      return {
+        id: s.userId,
+        name: rosterStudent?.name || s.userId, // Usar nombre real o fallback al userId
+        email: rosterStudent?.email || '',
+        avatar: rosterStudent?.photoUrl,
+        submitted: s.state === 'TURNED_IN' || s.state === 'RETURNED',
+        grade: typeof s.assignedGrade === 'number' && typeof assignment?.maxPoints === 'number' && assignment.maxPoints > 0
+          ? Number(((s.assignedGrade / assignment.maxPoints) * 100).toFixed(2))
+          : undefined,
+        submissionDate: s.updateTime,
+      };
+    });
     let corregida = 0, entregada = 0, pendiente = 0, reclamada = 0;
     students.forEach(s => {
-      if (s.submitted && typeof s.grade === 'number' && s.grade >= 7) corregida++;
-      else if (s.submitted && typeof s.grade === 'number' && s.grade < 7) entregada++;
+      if (s.submitted && typeof s.grade === 'number' && s.grade >= 70) corregida++;
+      else if (s.submitted && typeof s.grade === 'number' && s.grade < 70) entregada++;
       else if (s.submitted && typeof s.grade !== 'number') pendiente++;
       else reclamada++;
     });
-    const aprobados = students.filter(s => typeof s.grade === 'number' && s.grade >= 7).length;
+    const aprobados = students.filter(s => typeof s.grade === 'number' && s.grade >= 70).length;
     const aprobacionReal = students.length ? Math.round((aprobados / students.length) * 100) : 0;
     return {
       assignment,
@@ -137,6 +167,7 @@ export function useGradeStats({
     totalEntregas,
     totalPendientes,
     promedio,
+    porcentajeAprobados,
     mappedStudents,
     realDonutData,
     realBarTareaData,

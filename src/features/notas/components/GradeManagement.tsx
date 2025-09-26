@@ -13,8 +13,38 @@ import { StatsCards } from "./StatsCards";
 import { StudentList } from "./StudentList.tsx";
 import { useGradeManagementData } from "./useGradeManagementData";
 // import { useGoogleSubmissions } from '@/hooks/useGoogleSubmissions';
+import { useGoogleRoster } from '@/hooks/useGoogleRoster';
 import { useAllGoogleSubmissions } from './useAllGoogleSubmissions';
 import { useGradeStats } from './useGradeStats';
+
+// Función helper para formatear fechas de Google Classroom
+const formatDueDate = (dueDate: any): string => {
+	if (!dueDate) return '';
+	
+	try {
+		// Si es un objeto con propiedades de fecha (formato Google Classroom)
+		if (typeof dueDate === 'object' && dueDate.year) {
+			const day = dueDate.day?.toString().padStart(2, '0') || '01';
+			const month = dueDate.month?.toString().padStart(2, '0') || '01';
+			const year = dueDate.year;
+			return `${day}/${month}/${year}`;
+		}
+		
+		// Si es una cadena o timestamp
+		const date = new Date(dueDate);
+		if (isNaN(date.getTime())) {
+			return dueDate.toString();
+		}
+		
+		return date.toLocaleDateString('es-ES', {
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric'
+		});
+	} catch (error) {
+		return dueDate.toString();
+	}
+};
 
 export function GradeManagement() {
 
@@ -33,6 +63,9 @@ export function GradeManagement() {
 
 	// Traer submissions de todas las tareas del curso
 	const { allSubmissions, loading: loadingSubmissions, error: errorSubmissions } = useAllGoogleSubmissions(selectedCourse?.id, assignments);
+	
+	// Obtener la lista de estudiantes del curso (roster)
+	const { students: rosterStudents, loading: loadingRoster, error: errorRoster } = useGoogleRoster(selectedCourse?.id);
 
 	// Sincronizar selectedAssignment con tareas reales
 	useEffect(() => {
@@ -48,6 +81,7 @@ export function GradeManagement() {
 		totalEntregas,
 		totalPendientes,
 		promedio,
+		porcentajeAprobados,
 		mappedStudents,
 		realDonutData,
 		realBarTareaData,
@@ -59,6 +93,7 @@ export function GradeManagement() {
 		assignments,
 		allSubmissions,
 		selectedAssignmentId: selectedAssignment,
+		rosterStudents,
 	});
 
 	const assignment = assignments.find((a: any) => a.id === selectedAssignment);
@@ -90,9 +125,11 @@ export function GradeManagement() {
 		<div>
 			   <StatsCards
 				   totalCursos={totalCursos}
-				   calificaciones={totalEntregas}
-				   pendientes={totalPendientes}
+				   totalTareas={totalTareas}
+				   totalEntregas={totalEntregas}
+				   totalPendientes={totalPendientes}
 				   promedio={promedio}
+				   porcentajeAprobados={porcentajeAprobados}
 			   />
 			{/* Gráficos de seguimiento */}
 			   <ChartsSection donutData={realDonutData} barTareaData={realBarTareaData} barCelulaData={realBarCelulaData} />
@@ -124,7 +161,7 @@ export function GradeManagement() {
 															<div>
 																<CardTitle className="text-base text-purple-800 mb-1">{assignment.title}</CardTitle>
 																<p className="text-xs text-purple-500 mb-2">
-																	{assignment.dueDate ? `Vence: ${assignment.dueDate}` : ''}
+																	{assignment.dueDate ? `Vence: ${formatDueDate(assignment.dueDate)}` : ''}
 																</p>
 															</div>
 														</div>

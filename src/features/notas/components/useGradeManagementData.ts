@@ -152,9 +152,9 @@ export function useGradeManagementData() {
   };
 
   const getGradeColor = (grade: number) => {
-    if (grade >= 9) return "text-success";
-    if (grade >= 7) return "text-warning";
-    return "text-destructive";
+    if (grade >= 90) return "text-green-600";
+    if (grade >= 70) return "text-yellow-600";
+    return "text-red-600";
   };
 
   return {

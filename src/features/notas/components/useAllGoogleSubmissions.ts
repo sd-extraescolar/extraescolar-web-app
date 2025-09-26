@@ -37,11 +37,27 @@ export function useAllGoogleSubmissions(
       try {
         const results: AllSubmissions = {};
         for (const assignment of assignments) {
-          const response = await (window as any).gapi.client.classroom.courses.courseWork.studentSubmissions.list({
-            courseId,
-            courseWorkId: assignment.id,
-          });
-          results[assignment.id] = response.result.studentSubmissions || [];
+          // Obtener todas las entregas de esta tarea sin paginación
+          let allSubmissions: Submission[] = [];
+          let nextPageToken: string | undefined = undefined;
+          
+          do {
+            const response = await (window as any).gapi.client.classroom.courses.courseWork.studentSubmissions.list({
+              courseId,
+              courseWorkId: assignment.id,
+              pageSize: 100, // Máximo permitido por la API
+              pageToken: nextPageToken,
+            });
+            
+            const submissions = response.result.studentSubmissions || [];
+            allSubmissions = [...allSubmissions, ...submissions];
+            nextPageToken = response.result.nextPageToken;
+            
+            console.log(`Tarea ${assignment.title}: obtenidas ${submissions.length} entregas, total: ${allSubmissions.length}`);
+          } while (nextPageToken);
+          
+          results[assignment.id] = allSubmissions;
+          console.log(`Tarea ${assignment.title}: total de entregas obtenidas: ${allSubmissions.length}`);
         }
         if (!cancelled) setAllSubmissions(results);
       } catch (err) {
