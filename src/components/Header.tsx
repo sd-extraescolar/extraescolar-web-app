@@ -1,9 +1,6 @@
 import { CourseSelector } from "@/components/CourseSelector";
 import { Button } from "@/components/ui/button";
-import {
-  Menu,
-  School
-} from "lucide-react";
+import { Menu } from "lucide-react";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -27,10 +24,12 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
 
         {/* Logo and Title */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-education-green rounded flex items-center justify-center">
-            <School className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-xl text-dark-text font-semibold">Extraescolar</span>
+          <img 
+            src="/extraescolar-icon.png" 
+            alt="Extraescolar Logo" 
+            className="w-8 h-8 object-contain"
+          />
+          <span className="text-xl text-education-green font-semibold">Extraescolar</span>
         </div>
 
         {/* Course Selector */}

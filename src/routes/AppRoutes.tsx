@@ -1,5 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { NotFound } from "@/components/NotFound";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 import { AboutPage } from "@/features/about/page/AboutPage";
 import { DashboardPage } from "@/features/dashboard/page/DashboardPage";
 import LoginPage from "@/features/login/page/LoginPage";
@@ -16,11 +17,13 @@ export function AppRoutes({ isAuthenticated, isLoading }: AppRoutesProps) {
   // Mostrar loading mientras se verifica la autenticación
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">Verificando autenticación...</p>
-        </div>
+      <div className="min-h-screen">
+        <LoadingScreen 
+          title="Verificando autenticación..."
+          subtitle="Validando credenciales de Google"
+          spinnerSize="md"
+          spinnerColor="purple"
+        />
       </div>
     );
   }
