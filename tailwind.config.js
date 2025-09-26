@@ -69,6 +69,8 @@ export default {
         'dark-text': '#2C3E50',
         'medium-gray': '#95A5A6',
         'light-gray': '#ECF0F1',
+        'light-blue-gray': '#F8FAFB',
+        'sidebar-hover': '#F1F3F4',
         
         // Shadcn/ui compatible colors
         background: "hsl(var(--background))",

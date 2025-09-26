@@ -82,7 +82,7 @@ export const HomePage = () => {
         </div>
 
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
-          <button className="rounded-lg bg-education-green px-6 py-3 font-medium text-white shadow-md transition-colors hover:bg-education-green-600 hover:shadow-lg">
+          <button className="rounded-lg bg-education-green px-6 py-3 font-medium text-white transition-colors hover:bg-education-green-600">
             Comenzar ahora
           </button>
           <button className="rounded-lg border-2 border-digital-blue bg-white px-6 py-3 font-medium text-digital-blue transition-colors hover:bg-digital-blue-50">
@@ -93,7 +93,7 @@ export const HomePage = () => {
 
       {/* Target Audience */}
       <section className="grid gap-6 text-center md:grid-cols-3">
-        <div className="dark:bg-education-green-950/20 group rounded-lg border border-education-green-200 bg-education-green-50 p-6 transition-all hover:shadow-lg dark:border-education-green-800">
+        <div className="dark:bg-education-green-950/20 group rounded-lg border border-education-green-200 bg-education-green-50 p-6 transition-all hover:bg-education-green-100 dark:border-education-green-800">
           <div className="space-y-4">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-education-green text-3xl text-white">
               👨‍🏫
@@ -108,7 +108,7 @@ export const HomePage = () => {
           </div>
         </div>
 
-        <div className="dark:bg-digital-blue-950/20 group rounded-lg border border-digital-blue-200 bg-digital-blue-50 p-6 transition-all hover:shadow-lg dark:border-digital-blue-800">
+        <div className="dark:bg-digital-blue-950/20 group rounded-lg border border-digital-blue-200 bg-digital-blue-50 p-6 transition-all hover:bg-digital-blue-100 dark:border-digital-blue-800">
           <div className="space-y-4">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-digital-blue text-3xl text-white">
               🎓
@@ -123,7 +123,7 @@ export const HomePage = () => {
           </div>
         </div>
 
-        <div className="dark:bg-progress-yellow-950/20 group rounded-lg border border-progress-yellow-200 bg-progress-yellow-50 p-6 transition-all hover:shadow-lg dark:border-progress-yellow-800">
+        <div className="dark:bg-progress-yellow-950/20 group rounded-lg border border-progress-yellow-200 bg-progress-yellow-50 p-6 transition-all hover:bg-progress-yellow-100 dark:border-progress-yellow-800">
           <div className="space-y-4">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-progress-yellow text-3xl text-dark-text">
               📋
