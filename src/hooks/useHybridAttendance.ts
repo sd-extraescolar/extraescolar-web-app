@@ -7,6 +7,7 @@ import { AuthContext } from '@/contexts/AuthContext';
 import { useApiAttendance } from './useApiAttendance';
 import { cohorteService } from '@/services/cohorteService';
 import { apiClient } from '@/services/apiClient';
+import { useToast } from '@/components/ui/use-toast';
 import type { Evento } from '@/data';
 
 export interface HybridAttendanceRecord {
@@ -55,6 +56,7 @@ export interface UseHybridAttendanceReturn {
 export const useHybridAttendance = (): UseHybridAttendanceReturn => {
   const authContext = useContext(AuthContext);
   const apiAttendance = useApiAttendance();
+  const { toast } = useToast();
   
   const [records, setRecords] = useState<HybridAttendanceRecord[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -235,14 +237,27 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
         // Convertir a formato híbrido y agregar a la lista local
         const newRecord = convertApiEventoToRecord(newEvento);
         setRecords(prev => [...prev, newRecord]);
+        
+        // Mostrar notificación de éxito
+        toast({
+          title: "Evento creado",
+          description: `Registro de asistencia creado para ${selectedDate.toLocaleDateString('es-ES')}`,
+        });
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al crear registro';
       setError(errorMessage);
+      
+      // Mostrar notificación de error
+      toast({
+        title: "Error al crear evento",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [authContext?.selectedCourse, selectedDate, apiAttendance, convertApiEventoToRecord]);
+  }, [authContext?.selectedCourse, selectedDate, apiAttendance, convertApiEventoToRecord, toast]);
 
   // Cambiar estado de un estudiante
   const toggleStudentStatus = useCallback((studentId: string, status: 'present' | 'absent') => {
@@ -326,6 +341,12 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
       // Si no hay cambios, no hacer nada
       if (alumnosAgregados.length === 0 && alumnosRemovidos.length === 0) {
         console.log('No hay cambios en la asistencia');
+        
+        // Mostrar notificación informativa
+        toast({
+          title: "Sin cambios",
+          description: "No hay cambios en la asistencia para guardar",
+        });
         return;
       }
 
@@ -336,16 +357,29 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
         setRecords(prev => prev.map(record => 
           record.id === currentRecord.id ? updatedRecord : record
         ));
+        
+        // Mostrar notificación de éxito
+        toast({
+          title: "Asistencia guardada",
+          description: `Cambios guardados para ${selectedDate.toLocaleDateString('es-ES')}`,
+        });
       }
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al guardar registro';
       setError(errorMessage);
       console.error('Error saving record:', err);
+      
+      // Mostrar notificación de error
+      toast({
+        title: "Error al guardar",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [getCurrentRecord, apiAttendance, convertApiEventoToRecord]);
+  }, [getCurrentRecord, apiAttendance, convertApiEventoToRecord, selectedDate, toast]);
 
   // Eliminar registro
   const deleteRecord = useCallback(async (): Promise<void> => {
@@ -377,18 +411,38 @@ export const useHybridAttendance = (): UseHybridAttendanceReturn => {
         apiAttendance.removeEventoFromList(currentRecord.eventoId);
         
         console.log('Evento eliminado exitosamente');
+        
+        // Mostrar notificación de éxito
+        toast({
+          title: "Evento eliminado",
+          description: `Registro de asistencia eliminado para ${selectedDate.toLocaleDateString('es-ES')}`,
+        });
       } else {
         setError('No se pudo eliminar el evento');
+        
+        // Mostrar notificación de error
+        toast({
+          title: "Error al eliminar",
+          description: "No se pudo eliminar el evento",
+          variant: "destructive",
+        });
       }
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al eliminar registro';
       setError(errorMessage);
       console.error('Error deleting record:', err);
+      
+      // Mostrar notificación de error
+      toast({
+        title: "Error al eliminar",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [getCurrentRecord, apiAttendance]);
+  }, [getCurrentRecord, apiAttendance, selectedDate, toast]);
 
   // Seleccionar todos los estudiantes
   const selectAll = useCallback(() => {

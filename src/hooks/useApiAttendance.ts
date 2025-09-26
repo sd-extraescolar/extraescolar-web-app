@@ -6,6 +6,7 @@ import { useState, useCallback, useContext } from 'react';
 import { AuthContext } from '@/contexts/AuthContext';
 import { eventoService } from '@/services/eventoService';
 import { apiClient } from '@/services/apiClient';
+import { useToast } from '@/components/ui/use-toast';
 import type { Evento, CreateEventoRequest, AttendanceUpdateRequest } from '@/data';
 
 export interface ApiAttendanceRecord {
@@ -39,6 +40,7 @@ export interface UseApiAttendanceReturn {
 
 export const useApiAttendance = (): UseApiAttendanceReturn => {
   const authContext = useContext(AuthContext);
+  const { toast } = useToast();
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +110,7 @@ export const useApiAttendance = (): UseApiAttendanceReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [setupApiClient]);
+  }, [setupApiClient, toast]);
 
   // Marcar asistencia
   const markAttendance = useCallback(async (eventoId: string, alumnoIds: string[]): Promise<Evento | null> => {
@@ -128,16 +130,30 @@ export const useApiAttendance = (): UseApiAttendanceReturn => {
         evento.id === eventoId ? updatedEvento : evento
       ));
       
+      // Mostrar notificación de éxito
+      toast({
+        title: "Asistencia marcada",
+        description: `Se marcó asistencia para ${alumnoIds.length} estudiante(s)`,
+      });
+      
       return updatedEvento;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al marcar asistencia';
       setError(errorMessage);
       console.error('Error marking attendance:', err);
+      
+      // Mostrar notificación de error
+      toast({
+        title: "Error al marcar asistencia",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
       return null;
     } finally {
       setIsLoading(false);
     }
-  }, [setupApiClient]);
+  }, [setupApiClient, toast]);
 
   // Remover asistencia
   const removeAttendance = useCallback(async (eventoId: string, alumnoIds: string[]): Promise<Evento | null> => {
@@ -157,16 +173,30 @@ export const useApiAttendance = (): UseApiAttendanceReturn => {
         evento.id === eventoId ? updatedEvento : evento
       ));
       
+      // Mostrar notificación de éxito
+      toast({
+        title: "Asistencia removida",
+        description: `Se removió asistencia para ${alumnoIds.length} estudiante(s)`,
+      });
+      
       return updatedEvento;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al remover asistencia';
       setError(errorMessage);
       console.error('Error removing attendance:', err);
+      
+      // Mostrar notificación de error
+      toast({
+        title: "Error al remover asistencia",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
       return null;
     } finally {
       setIsLoading(false);
     }
-  }, [setupApiClient]);
+  }, [setupApiClient, toast]);
 
   // Obtener evento por ID
   const getEventoById = useCallback(async (eventoId: string): Promise<Evento | null> => {
@@ -185,7 +215,7 @@ export const useApiAttendance = (): UseApiAttendanceReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [setupApiClient]);
+  }, [setupApiClient, toast]);
 
   // Eliminar evento
   const deleteEvento = useCallback(async (eventoId: string): Promise<boolean> => {
@@ -204,7 +234,7 @@ export const useApiAttendance = (): UseApiAttendanceReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [setupApiClient]);
+  }, [setupApiClient, toast]);
 
   // Refrescar eventos
   const refreshEventos = useCallback(async (): Promise<void> => {
