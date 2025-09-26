@@ -8,6 +8,7 @@ const GOOGLE_AUTH_CONFIG = {
     accessToken: 'access_token',
     isAuthenticated: 'is_signed_in',
     courses: 'courses',
+    userProfile: 'user_profile',
     error: 'error'
   }
 };
@@ -17,11 +18,12 @@ export const googleAuthStorage = new AuthStorage<GoogleAuthData>(GOOGLE_AUTH_CON
 
 // Funciones de conveniencia específicas para Google Auth
 export const GoogleAuthUtils = {
-  saveSession: (accessToken: string, courses?: GoogleAuthData['courses']) => {
+  saveSession: (accessToken: string, courses?: GoogleAuthData['courses'], userProfile?: GoogleAuthData['userProfile']) => {
     return googleAuthStorage.save({
       accessToken,
       isAuthenticated: true,
       courses: courses || [],
+      userProfile: userProfile || null,
       error: null
     });
   },
@@ -32,6 +34,7 @@ export const GoogleAuthUtils = {
       accessToken: data.accessToken || null,
       isAuthenticated: Boolean(data.isAuthenticated && data.accessToken),
       courses: Array.isArray(data.courses) ? data.courses : [],
+      userProfile: data.userProfile || null,
       error: data.error || null
     };
   },

@@ -1,11 +1,14 @@
 import { Layout } from "@/components/Layout";
 import { NotFound } from "@/components/NotFound";
+import { LoadingScreen } from "@/components/ui/loading-screen";
+import { EmptyCoursesState } from "@/components/ui/empty-courses-state";
 import { AboutPage } from "@/features/about/page/AboutPage";
 import { DashboardPage } from "@/features/dashboard/page/DashboardPage";
 import LoginPage from "@/features/login/page/LoginPage";
 import { NotasPage } from "@/features/notas/page/NotasPage";
 import { PresencialidadPage } from "@/features/presencialidad/page/PresencialidadPage";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
@@ -13,14 +16,18 @@ interface AppRoutesProps {
 }
 
 export function AppRoutes({ isAuthenticated, isLoading }: AppRoutesProps) {
+  const { hasNoCourses } = useAuth();
+
   // Mostrar loading mientras se verifica la autenticación
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">Verificando autenticación...</p>
-        </div>
+      <div className="min-h-screen">
+        <LoadingScreen 
+          title="Verificando autenticación..."
+          subtitle="Validando credenciales de Google"
+          spinnerSize="md"
+          spinnerColor="purple"
+        />
       </div>
     );
   }
@@ -32,6 +39,11 @@ export function AppRoutes({ isAuthenticated, isLoading }: AppRoutesProps) {
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
+  }
+
+  // Si está autenticado pero no tiene cursos asignados como profesor
+  if (hasNoCourses) {
+    return <EmptyCoursesState />;
   }
 
   // Si está autenticado, mostrar rutas protegidas con layout

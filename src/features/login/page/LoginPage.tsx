@@ -1,7 +1,6 @@
-import { AnimatedBackground } from "@/components/animated-background"
-import { FloatingElements } from "@/components/floating-elements"
 import { GoogleSignInButton } from "@/components/google-sign-in-button"
 import { Logo } from "@/components/logo"
+import { StaticShapes } from "@/components/static-shapes"
 import { CourseList } from "@/features/login/components/CourseList"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -17,9 +16,8 @@ export default function LoginPage() {
   } = useAuth();
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden">
-      <AnimatedBackground />
-      <FloatingElements />
+    <div className="min-h-screen w-full relative overflow-hidden bg-blue-50">
+      <StaticShapes />
 
       {/* Header */}
       <header className="relative z-10 p-6">
@@ -34,7 +32,7 @@ export default function LoginPage() {
               <p className="font-bold text-2xl text-gray-300 mb-[-8px]">Beta</p>
             <h1 className="text-4xl md:text-5xl font-bold text-balance">
               {"¡Bienvenido a "}
-              <span className="text-primary">ExtraScolar</span>
+              <span className="text-primary">Extraescolar</span>
               {"!"}
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground text-pretty leading-relaxed">
@@ -90,84 +88,6 @@ export default function LoginPage() {
           <CourseList courses={courses} isLoading={isLoading} />
         )}
 
-        {/* Decorative elements that follow the drawn lines - positioned closer to corners */}
-        <div className="absolute left-0 top-8 w-1/4 h-1/3 pointer-events-none hidden lg:block">
-          <svg
-            className="w-full h-full opacity-20"
-            viewBox="0 0 300 400"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <path
-              d="M20 50 Q80 20 120 80 T180 150"
-              stroke="hsl(var(--accent))"
-              strokeWidth="3"
-              fill="none"
-              className="animate-pulse-glow"
-            />
-          </svg>
-        </div>
-
-        <div className="absolute right-0 top-8 w-1/4 h-1/3 pointer-events-none hidden lg:block">
-          <svg
-            className="w-full h-full opacity-25"
-            viewBox="0 0 300 400"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <defs>
-              <pattern id="dots-top" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                <circle cx="20" cy="20" r="2" fill="hsl(var(--primary))" />
-              </pattern>
-            </defs>
-            <rect width="200" height="150" fill="url(#dots-top)" className="animate-pulse-glow" />
-            <path
-              d="M180 40 L280 60 M200 80 L270 100 M190 120 L260 140"
-              stroke="hsl(var(--chart-2))"
-              strokeWidth="2"
-              strokeDasharray="10,5"
-              className="animate-float-geometric"
-            />
-          </svg>
-        </div>
-
-        {/* Bottom corner decorative elements */}
-        <div className="absolute left-0 bottom-8 w-1/4 h-1/4 pointer-events-none hidden lg:block">
-          <svg
-            className="w-full h-full opacity-15"
-            viewBox="0 0 300 300"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <path
-              d="M20 250 Q60 200 100 240 T160 270"
-              stroke="hsl(var(--secondary))"
-              strokeWidth="2"
-              fill="none"
-              className="animate-pulse-glow"
-            />
-          </svg>
-        </div>
-
-        <div className="absolute right-0 bottom-8 w-1/4 h-1/4 pointer-events-none hidden lg:block">
-          <svg
-            className="w-full h-full opacity-20"
-            viewBox="0 0 300 300"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <defs>
-              <pattern id="dots-bottom" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-                <circle cx="15" cy="15" r="1.5" fill="hsl(var(--chart-3))" />
-              </pattern>
-            </defs>
-            <rect width="150" height="120" x="150" y="180" fill="url(#dots-bottom)" className="animate-pulse-glow" />
-          </svg>
-        </div>
       </main>
     </div>
   )

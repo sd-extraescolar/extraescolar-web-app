@@ -1,4 +1,4 @@
-import type { Course, UseGoogleAuthReturn } from '@/data';
+import type { Course, Student, UseGoogleAuthReturn, UserProfile } from '@/data';
 import { GoogleAuthUtils } from '@/utils/GoogleAuthStorage';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -9,7 +9,20 @@ const DISCOVERY_DOCS = [
   "https://classroom.googleapis.com/$discovery/rest?version=v1",
 ];
 const SCOPES = 
-  "https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.coursework.me.readonly";
+  "https://www.googleapis.com/auth/userinfo.email " +
+  "https://www.googleapis.com/auth/userinfo.profile " +
+  "openid " +
+  "https://www.googleapis.com/auth/classroom.courses.readonly " +
+  "https://www.googleapis.com/auth/classroom.rosters.readonly " +
+  "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly " +
+  "https://www.googleapis.com/auth/classroom.coursework.students " +
+  "https://www.googleapis.com/auth/classroom.announcements " +
+  "https://www.googleapis.com/auth/classroom.course-work.readonly " +
+  "https://www.googleapis.com/auth/classroom.student-submissions.me.readonly " +
+  "https://www.googleapis.com/auth/classroom.rosters " +
+  "https://www.googleapis.com/auth/classroom.profile.emails " +
+  "https://www.googleapis.com/auth/classroom.profile.photos";
+  "https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.coursework.me.readonly https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
 
 // Declaración de tipos para Google Identity Services y API
 declare global {
@@ -54,6 +67,30 @@ declare global {
                 courses?: Course[];
               };
             }>;
+            students: {
+              list: (params: { courseId: string; pageSize?: number }) => Promise<{
+                result: {
+                  students?: Student[];
+                };
+              }>;
+            };
+          };
+        };
+      };
+      auth2: {
+        getAuthInstance: () => {
+          isSignedIn: {
+            get: () => boolean;
+          };
+          currentUser: {
+            get: () => {
+              getBasicProfile: () => {
+                getId: () => string;
+                getName: () => string;
+                getEmail: () => string;
+                getImageUrl: () => string;
+              };
+            };
           };
         };
       };
@@ -68,6 +105,13 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
   const [isSignedIn, setIsSignedIn] = useState<boolean>(savedData.isAuthenticated);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [courses, setCourses] = useState<Course[]>(savedData.courses);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(savedData.userProfile);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [currentCourseId, setCurrentCourseId] = useState<string | null>(null);
+  
+  // Debug: Log saved data
+  console.log('useGoogleAuth - savedData:', savedData);
+  console.log('useGoogleAuth - userProfile from storage:', savedData.userProfile);
   const [error, setError] = useState<string | null>(savedData.error);
   const [isGapiReady, setIsGapiReady] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(savedData.accessToken);
@@ -82,6 +126,8 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
           setAccessToken(null);
           setIsSignedIn(false);
           setCourses([]);
+          setStudents([]);
+          setCurrentCourseId(null);
           setError('Sesión expirada. Por favor, inicia sesión nuevamente.');
         }
       }
@@ -90,6 +136,74 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
     validatePersistedToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo ejecutar una vez al montar el componente
+
+  // Fetch user profile if authenticated but no profile data
+  useEffect(() => {
+    const fetchUserProfileIfNeeded = async () => {
+      if (isSignedIn && accessToken && !userProfile && window.gapi) {
+        console.log('User is authenticated but no profile data, fetching using Google Sign-In...');
+        try {
+          // Establecer el token de acceso en GAPI
+          window.gapi.client.setToken({ access_token: accessToken });
+          
+          // Intentar obtener información del usuario usando Google Sign-In
+          const authInstance = window.gapi.auth2.getAuthInstance();
+          if (authInstance && authInstance.isSignedIn.get()) {
+            const googleUser = authInstance.currentUser.get();
+            const profile = googleUser.getBasicProfile();
+            
+            console.log('Fetched user profile on load using Google Sign-In:', {
+              id: profile.getId(),
+              name: profile.getName(),
+              email: profile.getEmail(),
+              imageUrl: profile.getImageUrl()
+            });
+            
+            const userProfile: UserProfile = {
+              id: profile.getId(),
+              name: profile.getName(),
+              email: profile.getEmail(),
+              picture: profile.getImageUrl(),
+            };
+            
+            setUserProfile(userProfile);
+            // Update storage with the profile
+            GoogleAuthUtils.saveSession(accessToken, courses, userProfile);
+          } else {
+            // Fallback: usar fetch si Google Sign-In no está disponible
+            console.log('Google Sign-In not available on load, using fetch fallback...');
+            const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+              },
+            });
+            
+            if (!userResponse.ok) {
+              throw new Error('Error al obtener información del usuario');
+            }
+            
+            const userInfo = await userResponse.json();
+            console.log('Fetched user info on load using fetch (fallback):', userInfo);
+            
+            const profile: UserProfile = {
+              id: userInfo.id,
+              name: userInfo.name,
+              email: userInfo.email,
+              picture: userInfo.picture,
+            };
+            
+            setUserProfile(profile);
+            // Update storage with the profile
+            GoogleAuthUtils.saveSession(accessToken, courses, profile);
+          }
+        } catch (err) {
+          console.error('Error fetching user profile on load:', err);
+        }
+      }
+    };
+    
+    fetchUserProfileIfNeeded();
+  }, [isSignedIn, accessToken, userProfile, courses]);
 
   // Validar variables de entorno
   useEffect(() => {
@@ -102,6 +216,7 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
       return;
     }
   }, []);
+
 
   // Función para obtener cursos
   const fetchCourses = useCallback(async () => {
@@ -119,11 +234,14 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
       });
       
       const coursesList = response.result.courses || [];
+      
+      // La API de Google Classroom solo devuelve cursos donde el usuario es profesor
+      // No necesitamos filtrar adicionalmente ya que la API maneja esto automáticamente
       setCourses(coursesList);
       
       // Persistir cursos si hay token de acceso
       if (accessToken) {
-        GoogleAuthUtils.saveSession(accessToken, coursesList);
+        GoogleAuthUtils.saveSession(accessToken, coursesList, userProfile);
       }
     } catch (err) {
       console.error('Error obteniendo cursos:', err);
@@ -131,16 +249,114 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, userProfile]);
+
+  // Función para obtener estudiantes de un curso
+  const fetchStudents = useCallback(async (courseId: string) => {
+    if (!accessToken || !window.gapi) return;
+    
+    // Evitar llamadas duplicadas para el mismo curso
+    if (currentCourseId === courseId && students.length > 0) {
+      console.log(`Estudiantes ya cargados para el curso ${courseId}`);
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Establecer el token de acceso
+      window.gapi.client.setToken({ access_token: accessToken });
+      
+      const response = await window.gapi.client.classroom.courses.students.list({
+        courseId: courseId,
+        pageSize: 100,
+      });
+      
+      const studentsList = response.result.students || [];
+      setStudents(studentsList);
+      setCurrentCourseId(courseId);
+      
+      console.log(`Estudiantes obtenidos para el curso ${courseId}:`, studentsList);
+    } catch (err) {
+      console.error('Error obteniendo estudiantes:', err);
+      setError('Error al obtener los estudiantes del curso');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accessToken, currentCourseId, students.length]);
 
   // Callback para el OAuth token
-  const handleTokenResponse = useCallback((response: { access_token: string }) => {
+  const handleTokenResponse = useCallback(async (response: { access_token: string }) => {
     console.log('Token recibido:', response);
     setAccessToken(response.access_token);
     setIsSignedIn(true);
     
-    // Persistir datos de autenticación
-    GoogleAuthUtils.saveSession(response.access_token);
+    // Obtener perfil del usuario usando Google Sign-In
+    try {
+      console.log('Fetching user profile using Google Sign-In...');
+      
+      // Establecer el token de acceso en GAPI
+      window.gapi.client.setToken({ access_token: response.access_token });
+      
+      // Obtener información del usuario usando Google Sign-In
+      const authInstance = window.gapi.auth2.getAuthInstance();
+      if (authInstance && authInstance.isSignedIn.get()) {
+        const googleUser = authInstance.currentUser.get();
+        const profile = googleUser.getBasicProfile();
+        
+        console.log('User profile from Google Sign-In:', {
+          id: profile.getId(),
+          name: profile.getName(),
+          email: profile.getEmail(),
+          imageUrl: profile.getImageUrl()
+        });
+        
+        const userProfile: UserProfile = {
+          id: profile.getId(),
+          name: profile.getName(),
+          email: profile.getEmail(),
+          picture: profile.getImageUrl(),
+        };
+        
+        console.log('Created profile:', userProfile);
+        setUserProfile(userProfile);
+        
+        // Persistir datos de autenticación
+        GoogleAuthUtils.saveSession(response.access_token, [], userProfile);
+      } else {
+        // Fallback: usar fetch si Google Sign-In no está disponible
+        console.log('Google Sign-In not available, using fetch fallback...');
+        const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+          headers: {
+            'Authorization': `Bearer ${response.access_token}`,
+          },
+        });
+        
+        if (!userResponse.ok) {
+          throw new Error('Error al obtener información del usuario');
+        }
+        
+        const userInfo = await userResponse.json();
+        console.log('User info from Google API (fallback):', userInfo);
+        
+        const profile: UserProfile = {
+          id: userInfo.id,
+          name: userInfo.name,
+          email: userInfo.email,
+          picture: userInfo.picture,
+        };
+        
+        console.log('Created profile (fallback):', profile);
+        setUserProfile(profile);
+        
+        // Persistir datos de autenticación
+        GoogleAuthUtils.saveSession(response.access_token, [], profile);
+      }
+    } catch (err) {
+      console.error('Error obteniendo perfil del usuario:', err);
+      setError('Error al obtener la información del usuario');
+    }
   }, []);
 
   // Inicializar Google Identity Services y GAPI
@@ -253,6 +469,9 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
         setAccessToken(null);
         setIsSignedIn(false);
         setCourses([]);
+        setUserProfile(null);
+        setStudents([]);
+        setCurrentCourseId(null);
         
         // Limpiar datos persistidos
         GoogleAuthUtils.clearSession();
@@ -269,9 +488,13 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
     isSignedIn,
     isLoading,
     courses,
+    userProfile,
     error,
     handleLogin,
     handleLogout,
     isGapiReady,
+    students,
+    fetchStudents,
+    accessToken,
   };
 }
