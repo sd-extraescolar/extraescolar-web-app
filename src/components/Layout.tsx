@@ -27,11 +27,11 @@ export const Layout = ({ children }: LayoutProps) => {
     const width = window.innerWidth;
     
     if (width < 768) {
-      // Mobile: toggle sidebar open/close (absolute overlay)
+      // Mobile: toggle floating drawer
       toggleSidebar();
     } else if (width < 1024) {
-      // Tablet: do nothing (drawer stays closed)
-      return;
+      // Tablet: drawer is always visible but minimized
+      return; // No action needed, drawer is always shown minimized
     } else {
       // Desktop: toggle sidebar expanded/collapsed
       toggleSidebarExpanded();
@@ -56,9 +56,10 @@ export const Layout = ({ children }: LayoutProps) => {
       
       {/* Layout Container - Horizontal Flex with top margin for fixed header */}
       <div className="flex h-screen pt-16">
-        {/* Sidebar - Absolute on mobile, hidden on tablet, normal on desktop */}
+        {/* Sidebar - Different behavior per screen size */}
         <div className={`
           ${isSidebarOpen ? 'fixed top-16 bottom-0 left-0 z-50 md:hidden' : 'hidden md:block lg:block'}
+          h-full flex flex-col
         `}>
           <Sidebar 
             isOpen={isSidebarOpen} 

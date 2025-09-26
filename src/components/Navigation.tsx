@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import {
@@ -8,6 +7,7 @@ import {
   LogOut,
   Users
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 interface SidebarProps {
@@ -19,8 +19,27 @@ interface SidebarProps {
 export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) => {
   const location = useLocation();
   const { handleLogout, isLoading, isAuthenticated, userProfile } = useAuth();
+  const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
   
-  // Simple logic: show text when sidebar is expanded
+  // Listen for window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Auto-close mobile drawer when transitioning to tablet/desktop
+  useEffect(() => {
+    if (screenWidth >= 768 && isOpen && onClose) {
+      // Close the mobile drawer when transitioning to tablet/desktop
+      onClose();
+    }
+  }, [screenWidth, isOpen, onClose]);
+  
+  // Simple logic: show text when sidebar is expanded or floating
   const showText = isOpen || isExpanded;
 
   // User data - using real profile data from Google
@@ -63,14 +82,10 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
     return location.pathname === path;
   };
 
+
+
   return (
-    <div className={`
-      bg-light-blue-gray flex flex-col z-40
-      transition-all duration-300 ease-in-out
-      ${isOpen ? 'w-64' : 'w-auto'}
-      h-full
-      md:hidden lg:block
-    `}>
+    <div className="bg-light-blue-gray flex flex-col z-40 h-full w-auto">
       <nav className="flex-1 p-4">
         <div className="space-y-2">
           {navigationItems.map((item) => {
@@ -98,10 +113,8 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
                   onClick={handleClick}
                   className={cn(
                     "h-12 rounded-full font-normal flex items-center",
-                    // Layout based on sidebar state - always justify-start, centering achieved by padding
-                    "justify-start w-full",
-                    showText ? "gap-4 px-4" : "px-4 min-w-12",
-                    // Active states - always show full background when active
+                    showText ? "justify-start w-full gap-4 px-4" : "justify-center w-12",
+                    // Active states
                     active && item.id === "dashboard" && "bg-digital-blue-50 text-digital-blue hover:bg-digital-blue-100 cursor-default",
                     active && item.id === "grades" && "bg-progress-yellow-100 text-progress-yellow-600 hover:bg-progress-yellow-200 cursor-default",
                     active && item.id === "attendance" && "bg-alert-red-50 text-alert-red-600 hover:bg-alert-red-100 cursor-default",
@@ -127,14 +140,15 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
       </nav>
 
       {/* Footer Section */}
-      <div className="p-4 border-t border-gray-200 space-y-2">
+      <div className="mt-auto p-4 border-t border-gray-200 space-y-2">
         {/* Logout Button */}
         <button
           onClick={handleLogout}
           disabled={isLoading}
           className={cn(
-            "w-full h-12 rounded-full font-normal flex items-center justify-start transition-all duration-200",
-            showText ? "gap-4 px-4" : "px-4 min-w-12 justify-center",
+            "h-12 rounded-full font-normal flex items-center",
+            "justify-start w-full",
+            showText ? "gap-4 px-4" : "px-4 min-w-12",
             "text-red-500 bg-red-100 hover:bg-red-200 hover:text-red-600",
             isLoading && "opacity-50 cursor-not-allowed"
           )}
@@ -150,11 +164,11 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
         </button>
 
         {/* User Profile Section */}
-        <Button 
-          variant="ghost" 
+        <button 
           className={cn(
-            "h-12 rounded-full font-normal flex items-center justify-start hover:bg-sidebar-hover",
-            showText ? "gap-4 px-4 w-full" : "px-4 min-w-12 justify-center"
+            "h-12 rounded-full font-normal flex items-center hover:bg-sidebar-hover",
+            "justify-start w-full",
+            showText ? "gap-4 px-4" : "px-4 min-w-12"
           )}
         >
               <div className="flex items-center w-5 h-5 flex-shrink-0">
@@ -174,7 +188,7 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
               <p className="text-sm text-medium-gray truncate">{teacherEmail}</p>
             </div>
           )}
-        </Button>
+        </button>
       </div>
     </div>
   );
