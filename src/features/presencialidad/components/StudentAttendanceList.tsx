@@ -96,32 +96,15 @@ export const StudentAttendanceList = ({
             <div className="flex gap-2">
               <IconButton
                 onClick={() => {
-                  // Función para descargar datos
-                  const data = {
-                    fecha: selectedDate.toISOString().split('T')[0],
-                    estudiantes: students.map(student => ({
-                      nombre: student.name,
-                      email: student.email,
-                      estado: student.status === 'present' ? 'Presente' : 'Ausente'
-                    })),
-                    estadisticas: attendanceStats
-                  };
-                  
-                  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = `asistencia-${selectedDate.toISOString().split('T')[0]}.json`;
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  URL.revokeObjectURL(url);
+                  // Función deshabilitada - en desarrollo
+                  console.log('Función de descarga en desarrollo');
                 }}
                 icon={Download}
-                tooltip="Descargar datos"
+                tooltip="Función en desarrollo - Próximamente disponible"
                 size="default"
                 variant="outline"
-                className="w-10 h-10 border border-education-green-300 text-education-green-600 bg-transparent hover:bg-education-green-50"
+                disabled={true}
+                className="w-10 h-10 border border-gray-300 text-gray-400 bg-transparent cursor-not-allowed opacity-50"
               />
               <Button
                 onClick={onSaveAttendance}
