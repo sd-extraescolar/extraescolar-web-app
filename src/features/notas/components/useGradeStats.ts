@@ -75,12 +75,18 @@ export function useGradeStats({
 
   // Per-assignment stats for all assignments
   const perAssignmentStats = assignments.map(assignment => {
+    console.log(`\n=== PROCESANDO TAREA: ${assignment.title} ===`);
+    console.log('Assignment:', assignment);
+    
     const assignmentSubmissions = allSubmissions[assignment.id] || [];
+    console.log('Assignment submissions:', assignmentSubmissions);
+    console.log('Roster students:', rosterStudents);
+    
     const students: Student[] = assignmentSubmissions.map(s => {
       // Buscar el estudiante en el roster para obtener su nombre real
       const rosterStudent = rosterStudents.find(rs => rs.id === s.userId);
       
-      return {
+      const studentData = {
         id: s.userId,
         name: rosterStudent?.name || s.userId, // Usar nombre real o fallback al userId
         email: rosterStudent?.email || '',
@@ -91,13 +97,37 @@ export function useGradeStats({
           : undefined,
         submissionDate: s.updateTime,
       };
+      
+      console.log(`\n--- ESTUDIANTE: ${studentData.name} ---`);
+      console.log('Submission data:', s);
+      console.log('Roster student:', rosterStudent);
+      console.log('Student data:', studentData);
+      console.log(`Estado: submitted=${studentData.submitted}, grade=${studentData.grade}, grade type=${typeof studentData.grade}`);
+      console.log(`Submission state: ${s.state}`);
+      console.log(`Assigned grade: ${s.assignedGrade}`);
+      console.log(`Max points: ${assignment?.maxPoints}`);
+      
+      return studentData;
     });
-    let corregida = 0, entregada = 0, pendiente = 0, reclamada = 0;
+    let corregida = 0, entregada = 0, comenzada = 0, reclamada = 0;
     students.forEach(s => {
-      if (s.submitted && typeof s.grade === 'number' && s.grade >= 70) corregida++;
-      else if (s.submitted && typeof s.grade === 'number' && s.grade < 70) entregada++;
-      else if (s.submitted && typeof s.grade !== 'number') pendiente++;
-      else reclamada++;
+      // NUEVA LÓGICA:
+      // "corregida" (verde): entregó Y tiene nota
+      if (s.submitted && typeof s.grade === 'number') {
+        corregida++;
+      }
+      // "entregada" (azul): entregó PERO NO tiene nota
+      else if (s.submitted && (s.grade === undefined || s.grade === null)) {
+        entregada++;
+      }
+      // "comenzada" (amarillo): NO entregó Y NO tiene nota
+      else if (!s.submitted && (s.grade === undefined || s.grade === null)) {
+        comenzada++;
+      }
+      // "reclamada" (rojo): casos especiales
+      else {
+        reclamada++;
+      }
     });
     const aprobados = students.filter(s => typeof s.grade === 'number' && s.grade >= 70).length;
     const aprobacionReal = students.length ? Math.round((aprobados / students.length) * 100) : 0;
@@ -106,7 +136,7 @@ export function useGradeStats({
       students,
       corregida,
       entregada,
-      pendiente,
+      comenzada, // Cambiado de pendiente a comenzada
       reclamada,
       aprobacionReal,
       submittedCount: students.filter(s => s.submitted).length,
@@ -123,7 +153,7 @@ export function useGradeStats({
   const donutTotals = perAssignmentStats.reduce((acc, stat) => {
     acc.corregida += stat.corregida;
     acc.entregada += stat.entregada;
-    acc.comenzada += stat.pendiente;
+    acc.comenzada += stat.comenzada; // Cambiado de stat.pendiente a stat.comenzada
     acc.reclamada += stat.reclamada;
     return acc;
   }, { corregida: 0, entregada: 0, comenzada: 0, reclamada: 0 });
@@ -140,7 +170,7 @@ export function useGradeStats({
     name: stat.assignment.title,
     corregida: stat.corregida,
     entregada: stat.entregada,
-    comenzada: stat.pendiente,
+    comenzada: stat.comenzada, // Cambiado de stat.pendiente a stat.comenzada
     reclamada: stat.reclamada,
   }));
   const realBarCelulaData = [...realBarTareaData];
