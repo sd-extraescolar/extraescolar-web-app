@@ -10,113 +10,67 @@ import { CardTitle } from "@/components/ui/card";
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect } from 'react';
 import { useGoogleCourseWork } from '@/hooks/useGoogleCourseWork';
-import { useGoogleSubmissions } from '@/hooks/useGoogleSubmissions';
+// import { useGoogleSubmissions } from '@/hooks/useGoogleSubmissions';
+import { useAllGoogleSubmissions } from './useAllGoogleSubmissions';
+import { useGradeStats } from './useGradeStats';
 
 export function GradeManagement() {
-			const { courses, selectedCourse } = useAuth();
-			const { courseWork, loading: loadingCourseWork, error: errorCourseWork } = useGoogleCourseWork(selectedCourse?.id);
-			const {
-				selectedAssignment,
-				setSelectedAssignment,
-				searchTerm,
-				handleSendNotification,
-				getGradeColor
-			} = useGradeManagementData();
-			const { submissions, loading: loadingSubmissions, error: errorSubmissions } = useGoogleSubmissions(selectedCourse?.id, selectedAssignment);
 
-		// Usar tareas reales de Google Classroom
-		const assignments = courseWork || [];
-		const assignment = assignments.find((a: any) => a.id === selectedAssignment);
+	const { courses, selectedCourse } = useAuth();
+	const { courseWork, loading: loadingCourseWork, error: errorCourseWork } = useGoogleCourseWork(selectedCourse?.id);
+	// Usar tareas reales de Google Classroom
+	const assignments = courseWork || [];
 
-		// Sincronizar selectedAssignment con tareas reales
-		useEffect(() => {
-			if (assignments.length > 0 && (!selectedAssignment || !assignments.some(a => a.id === selectedAssignment))) {
-				setSelectedAssignment(assignments[0].id);
-			}
-		}, [assignments, selectedAssignment, setSelectedAssignment]);
+	const {
+		selectedAssignment,
+		setSelectedAssignment,
+		searchTerm,
+		handleSendNotification,
+		getGradeColor
+	} = useGradeManagementData();
 
-		// Calcular stats globales para las cards
-		const totalCursos = courses.length;
-		const totalTareas = assignments.length;
-		const totalEntregas = assignments.reduce((acc, a) => acc + (a.submissionCount || 0), 0);
-		const totalPendientes = assignments.reduce((acc, a) => acc + ((a.assignedCount || 0) - (a.submissionCount || 0)), 0);
-		const allGrades = assignments.flatMap(a => a.maxPoints ? [a.maxPoints] : []);
-		const promedio = allGrades.length ? Number((allGrades.reduce((a, b) => a + b, 0) / allGrades.length).toFixed(2)) : 0;
-		const aprobacion = 0; // No hay info de aprobados global, se puede calcular si hay grades reales
+	// Traer submissions de todas las tareas del curso
+	const { allSubmissions, loading: loadingSubmissions, error: errorSubmissions } = useAllGoogleSubmissions(selectedCourse?.id, assignments);
 
-
-
-		// Mapear submissions a estructura de estudiantes
-		const mappedStudents = submissions.map(s => ({
-			id: s.userId,
-			name: s.userId, // Si tienes acceso a nombres reales, cámbialo aquí
-			email: '', // Si tienes acceso a emails reales, cámbialo aquí
-			submitted: s.state === 'TURNED_IN' || s.state === 'RETURNED',
-			grade: typeof s.assignedGrade === 'number' && typeof assignment?.maxPoints === 'number' && assignment.maxPoints > 0
-				? Number(((s.assignedGrade / assignment.maxPoints) * 10).toFixed(2))
-				: undefined,
-			submissionDate: s.updateTime,
-		}));
-
-		// Calcular estados para gráficos (corregida, entregada, pendiente, reclamada)
-		let corregida = 0, entregada = 0, pendiente = 0, reclamada = 0;
-		mappedStudents.forEach(s => {
-			if (s.submitted && typeof s.grade === 'number' && s.grade >= 7) corregida++;
-			else if (s.submitted && typeof s.grade === 'number' && s.grade < 7) entregada++;
-			else if (s.submitted && typeof s.grade !== 'number') pendiente++;
-			else reclamada++;
-		});
-
-		const realDonutData = [
-			{ name: 'corregida', value: corregida, color: '#34D399' },
-			{ name: 'entregada', value: entregada, color: '#60A5FA' },
-			{ name: 'comenzada', value: pendiente, color: '#FBBF24' },
-			{ name: 'reclamada', value: reclamada, color: '#F87171' },
-		];
-
-		const realBarTareaData = assignment ? [{
-			name: assignment.title,
-			corregida,
-			entregada,
-			comenzada: pendiente,
-			reclamada,
-		}] : [];
-		const realBarCelulaData = [...realBarTareaData];
-
-		// Calcular aprobación real
-		const aprobados = mappedStudents.filter(s => typeof s.grade === 'number' && s.grade >= 7).length;
-		const aprobacionReal = mappedStudents.length ? Math.round((aprobados / mappedStudents.length) * 100) : 0;
-
+	// Sincronizar selectedAssignment con tareas reales
 	useEffect(() => {
-		if (assignments.length > 0) {
-			console.log('Tareas traídas de la API:', assignments);
+		if (assignments.length > 0 && (!selectedAssignment || !assignments.some(a => a.id === selectedAssignment))) {
+			setSelectedAssignment(assignments[0].id);
 		}
-	}, [assignments]);
+	}, [assignments, selectedAssignment, setSelectedAssignment]);
 
-	useEffect(() => {
-		if (assignment && submissions && submissions.length > 0) {
-			const grades = submissions.map(s => ({
-				userId: s.userId,
-				assignedGrade: s.assignedGrade,
-				maxPoints: assignment.maxPoints,
-				gradeEscala10: typeof s.assignedGrade === 'number' && typeof assignment.maxPoints === 'number' && assignment.maxPoints > 0
-					? Number(((s.assignedGrade / assignment.maxPoints) * 10).toFixed(2))
-					: undefined,
-			}));
-			console.log('Calificaciones mapeadas:', grades);
-		}
-	}, [assignment, submissions]);
+
+	const {
+		totalCursos,
+		totalTareas,
+		totalEntregas,
+		totalPendientes,
+		promedio,
+		mappedStudents,
+		realDonutData,
+		realBarTareaData,
+		realBarCelulaData,
+		aprobacionReal,
+		assignmentStats,
+	} = useGradeStats({
+		courses,
+		assignments,
+		allSubmissions,
+		selectedAssignmentId: selectedAssignment,
+	});
+
+	const assignment = assignments.find((a: any) => a.id === selectedAssignment);
 
 		return (
 			<div>
-				<StatsCards
-					totalCursos={totalCursos}
-					calificaciones={totalEntregas}
-					pendientes={totalPendientes}
-					promedio={promedio}
-				/>
+				   <StatsCards
+					   totalCursos={totalCursos}
+					   calificaciones={totalEntregas}
+					   pendientes={totalPendientes}
+					   promedio={promedio}
+				   />
 				{/* Gráficos de seguimiento */}
-				<ChartsSection donutData={realDonutData} barTareaData={realBarTareaData} barCelulaData={realBarCelulaData} />
+				   <ChartsSection donutData={realDonutData} barTareaData={realBarTareaData} barCelulaData={realBarCelulaData} />
 				{/* Card de tareas y detalles */}
 				<div className="mb-8 bg-blue-50 rounded-xl p-6">
 					<h3 className="text-xl font-bold text-black mb-4">Tareas</h3>
@@ -161,15 +115,12 @@ export function GradeManagement() {
 							{assignment && (
 								<div className="rounded-xl">
 									<div className="pt-6 px-6 pb-6 rounded-xl">
-										<AssignmentStats
-											submittedCount={mappedStudents.filter(s => s.submitted).length}
-											totalStudents={mappedStudents.length}
-											averageGrade={(() => {
-												const grades = mappedStudents.map(s => typeof s.grade === 'number' ? s.grade : undefined).filter((g): g is number => typeof g === 'number');
-												return grades.length ? Number((grades.reduce((a, b) => a + b, 0) / grades.length).toFixed(2)) : 0;
-											})()}
-											passRate={aprobacionReal}
-										/>
+										   <AssignmentStats
+											   submittedCount={assignmentStats.submittedCount}
+											   totalStudents={assignmentStats.totalStudents}
+											   averageGrade={assignmentStats.averageGrade}
+											   passRate={assignmentStats.passRate}
+										   />
 										<div className="mb-3">
 											<h4 className="font-semibold text-dark-text mb-3">Detalles por Estudiante</h4>
 											{loadingSubmissions && <div>Cargando entregas...</div>}
