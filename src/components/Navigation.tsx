@@ -8,7 +8,6 @@ import {
   LogOut,
   Users
 } from "lucide-react";
-import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 interface SidebarProps {
@@ -32,13 +31,6 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
   console.log('Navigation - userProfile:', userProfile);
   console.log('Navigation - isAuthenticated:', isAuthenticated);
 
-  // Close drawer when route changes (only for mobile)
-  useEffect(() => {
-    // Only close if the drawer is actually open (mobile state)
-    if (isOpen && onClose) {
-      onClose();
-    }
-  }, [location.pathname, isOpen, onClose]);
 
   const navigationItems = [
     {
@@ -74,7 +66,10 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
   return (
     <div className={`
       bg-light-blue-gray flex flex-col z-40
-      transition-all duration-300 ease-in-out w-auto
+      transition-all duration-300 ease-in-out
+      ${isOpen ? 'w-64' : 'w-auto'}
+      h-full
+      md:hidden lg:block
     `}>
       <nav className="flex-1 p-4">
         <div className="space-y-2">
@@ -82,7 +77,13 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
             const Icon = item.icon;
             const active = isActive(item.path);
 
-            const handleClick = () => {
+            const handleClick = (e: React.MouseEvent) => {
+              // Prevent navigation if already on this page
+              if (active) {
+                e.preventDefault();
+                return;
+              }
+              
               // Only close the drawer on mobile (when isOpen is true)
               // On desktop, don't expand/collapse when clicking nav items
               if (isOpen && onClose) {
@@ -101,11 +102,11 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
                     "justify-start w-full",
                     showText ? "gap-4 px-4" : "px-4 min-w-12",
                     // Active states - always show full background when active
-                    active && item.id === "dashboard" && "bg-digital-blue-50 text-digital-blue hover:bg-digital-blue-100",
-                    active && item.id === "grades" && "bg-progress-yellow-100 text-progress-yellow-600 hover:bg-progress-yellow-200",
-                    active && item.id === "attendance" && "bg-alert-red-50 text-alert-red-600 hover:bg-alert-red-100",
+                    active && item.id === "dashboard" && "bg-digital-blue-50 text-digital-blue hover:bg-digital-blue-100 cursor-default",
+                    active && item.id === "grades" && "bg-progress-yellow-100 text-progress-yellow-600 hover:bg-progress-yellow-200 cursor-default",
+                    active && item.id === "attendance" && "bg-alert-red-50 text-alert-red-600 hover:bg-alert-red-100 cursor-default",
                     // Inactive states
-                    !active && "text-dark-text hover:bg-sidebar-hover",
+                    !active && "text-dark-text hover:bg-sidebar-hover cursor-pointer",
                   )}
                 >
                   <div className="flex items-center w-5 h-5 flex-shrink-0">
