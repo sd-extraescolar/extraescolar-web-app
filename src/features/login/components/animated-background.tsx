@@ -191,10 +191,10 @@ export function AnimatedBackground() {
         const alphaColorString = `hsla(${particle.color.hue}, ${particle.color.sat}%, ${particle.color.light}%, ${particle.opacity})`
 
         if (particle.isGeometric) {
-          particle.rotation += particle.rotationSpeed
+          particle.rotation = (particle.rotation || 0) + (particle.rotationSpeed || 0)
           ctx.save()
           ctx.translate(particle.x, particle.y)
-          ctx.rotate((particle.rotation * Math.PI) / 180)
+          ctx.rotate(((particle.rotation || 0) * Math.PI) / 180)
 
           if (particle.isOutlined) {
             ctx.strokeStyle = colorString

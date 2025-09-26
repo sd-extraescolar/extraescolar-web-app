@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ComponentType } from "react";
+import { type ComponentType } from "react";
 
 interface IconButtonProps {
   onClick: () => void;

@@ -181,7 +181,7 @@ export const useAttendance = () => {
   const getCalendarAttendanceData = useCallback(() => {
     const data: Record<string, { present: number; total: number; percentage: number }> = {};
     
-    Object.entries(attendanceRecords).forEach(([date, record]) => {
+    Object.entries(attendanceRecords).forEach(([date]) => {
       const stats = getAttendanceStats(new Date(date));
       data[date] = {
         present: stats.present,

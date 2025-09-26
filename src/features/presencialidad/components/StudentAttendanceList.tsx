@@ -65,10 +65,8 @@ export const StudentAttendanceList = ({
 
   // Determinar si todos los estudiantes filtrados están seleccionados
   const allSelected = filteredStudents.length > 0 && filteredStudents.every(student => student.status === 'present');
-  const someSelected = filteredStudents.some(student => student.status === 'present');
   
   // Determinar el modo del botón basado en el estado actual
-  const shouldSelectAll = !allSelected && someSelected;
   const shouldDeselectAll = allSelected;
 
 
