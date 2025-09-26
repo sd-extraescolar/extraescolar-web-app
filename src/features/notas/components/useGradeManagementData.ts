@@ -145,7 +145,7 @@ export function useGradeManagementData() {
   const [selectedAssignment, setSelectedAssignment] = useState<string>(mockAssignments[0]?.id || "");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSendNotification = async (studentEmail: string, assignmentTitle: string) => {
+  const handleSendNotification = async (_studentEmail: string, _assignmentTitle: string) => {
     // Simulate sending email notification
     // Here you would integrate with your email service
   };
