@@ -33,7 +33,7 @@ export function GradeManagement() {
 					<p className="text-muted-foreground">Administra las calificaciones de tus estudiantes</p>
 				</div>
 				{/* Stats Cards */}
-				<StatsCards totalCursos={3} calificaciones={65} pendientes={7} promedio={8.17} solidColors />
+				   <StatsCards totalCursos={3} calificaciones={65} pendientes={7} promedio={8.17} />
 				{/* Gráficos de seguimiento */}
 				<ChartsSection donutData={donutData} barTareaData={barTareaData} barCelulaData={barCelulaData} />
 				   {/* Card de tareas y detalles */}
@@ -59,19 +59,19 @@ export function GradeManagement() {
 												   >
 													   <div className="flex flex-col gap-2 px-4 py-4 h-full justify-between">
 														   <div>
-															   <CardTitle className="text-base text-dark-text mb-1">{assignment.title}</CardTitle>
-															   <p className="text-xs text-medium-gray mb-2">
+															   <CardTitle className="text-base text-purple-800 mb-1">{assignment.title}</CardTitle>
+															   <p className="text-xs text-purple-500 mb-2">
 																   {assignment.subject} • Vence: {assignment.dueDate}
 															   </p>
 														   </div>
 														   <div className="flex flex-col gap-1">
-															   <div className="text-xs font-medium text-dark-text">
+															   <div className="text-xs font-medium text-purple-800">
 																   {assignment.submittedCount}/{assignment.totalStudents} entregados
 															   </div>
-															   <div className="text-xs text-medium-gray">
+															   <div className="text-xs text-purple-500">
 																   Promedio: <span className={getGradeColor(assignment.averageGrade)}>{assignment.averageGrade}/10</span>
 															   </div>
-															   <div className="text-xs font-medium text-education-green-700">{assignment.passRate}% aprobación</div>
+															   <div className="text-xs font-medium text-purple-700">{assignment.passRate}% aprobación</div>
 															   <Progress value={assignment.passRate} className="w-full h-2 mt-1" />
 														   </div>
 													   </div>
@@ -85,7 +85,7 @@ export function GradeManagement() {
 					   {/* Información fija de la tarea seleccionada */}
 					   {assignment && (
 						   <div className="rounded-xl">
-							   <div className="pt-6 px-6 pb-6 bg-light-blue-gray rounded-xl">
+							   <div className="pt-6 px-6 pb-6 rounded-xl">
 								   <AssignmentStats
 									   submittedCount={assignment.submittedCount}
 									   totalStudents={assignment.totalStudents}
