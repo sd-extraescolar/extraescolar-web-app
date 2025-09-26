@@ -116,7 +116,7 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
                   onClick={handleClick}
                   className={cn(
                     "h-12 rounded-full font-normal flex items-center",
-                    showText ? "justify-start w-full gap-4 px-4" : "justify-center w-12",
+                    showText ? "justify-start w-full gap-4 px-4" : "justify-start w-12 pl-4",
                     // Active states
                     active && item.id === "dashboard" && "bg-digital-blue-50 text-digital-blue hover:bg-digital-blue-100 cursor-default",
                     active && item.id === "grades" && "bg-progress-yellow-100 text-progress-yellow-600 hover:bg-progress-yellow-200 cursor-default",
@@ -125,7 +125,7 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
                     !active && "text-dark-text hover:bg-sidebar-hover cursor-pointer",
                   )}
                 >
-                  <div className="flex items-center w-5 h-5 flex-shrink-0">
+                  <div className="flex items-center justify-center w-5 h-5 flex-shrink-0">
                     <Icon
                       className="h-5 w-5"
                     />
@@ -150,12 +150,12 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
           disabled={isLoading}
           className={cn(
             "h-12 rounded-full font-normal flex items-center",
-            showText ? "justify-start w-full gap-4 px-4" : "justify-center w-12",
+            showText ? "justify-start w-full gap-4 px-4" : "justify-start w-12 pl-4",
             "text-red-500 bg-red-100 hover:bg-red-200 hover:text-red-600",
             isLoading && "opacity-50 cursor-not-allowed"
           )}
         >
-          <div className="flex items-center w-5 h-5 flex-shrink-0">
+          <div className="flex items-center justify-center w-5 h-5 flex-shrink-0">
             <LogOut className="h-5 w-5" />
           </div>
           {showText && (
@@ -169,10 +169,10 @@ export const Sidebar = ({ isOpen, isExpanded = false, onClose }: SidebarProps) =
         <button 
           className={cn(
             "h-12 rounded-full font-normal flex items-center hover:bg-sidebar-hover",
-            showText ? "justify-start w-full gap-4 px-4" : "justify-center w-12"
+            showText ? "justify-start w-full gap-4 px-4" : "justify-start w-12 pl-4"
           )}
         >
-              <div className="flex items-center w-5 h-5 flex-shrink-0">
+              <div className="flex items-center justify-center w-5 h-5 flex-shrink-0">
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={userProfile?.picture || "/teacher-avatar.jpg"} />
                   <AvatarFallback className="bg-education-green text-white font-semibold text-xs">
